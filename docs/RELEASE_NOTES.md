@@ -1,42 +1,23 @@
-# Nuxpad 2.0.0-rc5.1
+# Nuxpad 2.2.8
 
-## Windows identity
+Nuxpad 2.2.8 is a focused AppMenu, About, and release-identity alignment release based on 2.1.0-r2.
 
-The Windows organisation and executable CompanyName are now:
+## Interface
 
-```text
-brunonlinespace
-```
+- Removes icons from all AppMenu actions while leaving non-menu interface icons unchanged.
+- Renames **Font…** to **Display Font…** in View.
+- Reorders the Edit menu insertion commands to **Date + Time → Date → Time**.
+- Mirrors that date/time order in the Keyboard Shortcuts dialog.
 
-The configuration path is:
+## About and project identity
 
-```text
-%APPDATA%\brunonlinespace\Nuxpad2\nuxpad.json
-```
+- Updates the repository to <https://github.com/brunonlinespace/nuxpad>.
+- Replaces the previous two-editor comparison with the approved Notepad-only About description.
+- Sets the About description to: **“A lightweight text editor for Linux and Windows, inspired by the simplicity of the classic Microsoft Notepad.”**
 
-Nuxpad migrates the prior `BrunoOnlineSpace` directory spelling and preserves
-the existing `nuxpad.json` settings.
+## Release identity
 
-Windows itself creates MuiCache entries for executable paths. Newly built RC5.1
-executables expose the corrected lowercase company metadata. Old cache entries
-for earlier build folders may remain until Windows removes them; Nuxpad does
-not delete user registry data.
+- Updates source, Suite component metadata, AppStream metadata, AppImage packaging, Windows packaging, and QA contracts to **2.2.8**.
+- AppStream current-release date is **2026-10-08**.
 
-## Toolbar List control
-
-The button now reads:
-
-```text
-• List
-```
-
-The platform-dependent list icon and narrow fixed width were removed, fixing
-the Windows `Lis` truncation while preserving Ctrl+L and list insertion.
-
-## AppImage icon contrast
-
-AppImage menu and persistent search icons are rendered as light monochrome
-icons in dark mode and dark monochrome icons in light mode. They refresh
-immediately when View → Dark Mode changes.
-
-Portable Linux and Windows remain host-themed.
+No unrelated editor workflow or file-format behavior is changed.

@@ -1,9 +1,23 @@
-# Cross-platform architecture
+# Nuxpad 2 cross-platform architecture
 
-Nuxpad uses one shared PyQt6 application source: `source/nuxpad.py`.
+Nuxpad 2.2.8 uses one shared PyQt6 application implementation:
 
-Shared behaviour includes editing, layouts, encoding/BOM/line endings, atomic saves, external-change protection, search, printing, windows, drag/drop, `.LOG`, Symbols, and preferences.
+```text
+nuxpad2/source/nuxpad.py
+```
 
-Linux-specific boundaries: XDG path, desktop/AppImage packaging, host character maps, AppImage QSS themes.
+The project-root `main.py` is the canonical Portable entrypoint on every platform.
 
-Windows-specific boundaries: `%APPDATA%`, Windows Character Map, AppUserModelID/version resources, and PowerShell/PyInstaller packaging.
+Linux preferences:
+
+```text
+~/.config/brunonlinespace/nuxpad2/nuxpad.json
+```
+
+Windows preferences:
+
+```text
+%APPDATA%\brunonlinespace\Nuxpad2\nuxpad.json
+```
+
+Linux AppImage-specific themes remain isolated to the AppImage runtime. Source-portable Linux and Windows continue to use the host Qt style.

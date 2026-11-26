@@ -1,21 +1,12 @@
-# Fedora 43/44 AppImage build plan
+# Nuxpad 2.2.8 Fedora AppImage build
 
-Build the first distributable candidate on Fedora 43 for the older Phase 1
-baseline, then test that exact AppImage on Fedora 44.
+Use:
 
-The AppDir template contains metadata and branding only. During the build,
-PyInstaller freezes the single canonical `source/nuxpad.py` into
-`usr/lib/nuxpad`, and `usr/bin/nuxpad` points to the frozen executable.
+```bash
+chmod +x nuxpad2/packaging/fedora/build-appimage.sh
+./nuxpad2/packaging/fedora/build-appimage.sh
+```
 
-Required post-build checks:
+The builder is non-privileged: it checks host prerequisites but does not run `sudo`, `dnf`, `pkexec`, or `su`.
 
-- launch without system Python or PyQt6
-- KDE Plasma Wayland
-- Fedora 43 and Fedora 44
-- `%F` with at least three files
-- desktop icon and task-switcher identity
-- Open With Nuxpad
-- drag and drop
-- print to PDF
-- external More Symbols fallback
-- configuration migration
+Validated build hosts are Fedora 43/44 on native x86_64 or aarch64. Finished artifacts are written to `nuxpad2/dist/`.

@@ -1,11 +1,11 @@
-# Linux AppImage themes
+# Nuxpad 2 AppImage themes
 
-The Linux AppImage includes Breeze-inspired dark and light Qt stylesheets. Portable Linux and Windows remain host-themed.
-
-Use `View → Dark Mode`, or one-launch overrides:
+The AppImage preserves Nuxpad's existing AppImage-only dark/light/system theme selection.
 
 ```bash
-./Nuxpad-2.0.0-rc5.1-x86_64.AppImage --appimage-theme=dark
-./Nuxpad-2.0.0-rc5.1-x86_64.AppImage --appimage-theme=light
-./Nuxpad-2.0.0-rc5.1-x86_64.AppImage --appimage-theme=system
+./Nuxpad-2.2.8-x86_64.AppImage --appimage-theme=dark
+./Nuxpad-2.2.8-x86_64.AppImage --appimage-theme=light
+./Nuxpad-2.2.8-x86_64.AppImage --appimage-theme=system
 ```
+
+Source-portable runs do not force an AppImage theme.

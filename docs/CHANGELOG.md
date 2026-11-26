@@ -1,5 +1,37 @@
 # Changelog
 
+## 2.2.8
+
+- Remove all icons from AppMenu actions.
+- Rename **Font…** to **Display Font…**.
+- Move **Date + Time** before **Date**, producing **Date + Time → Date → Time**.
+- Update the project repository to `https://github.com/brunonlinespace/nuxpad`.
+- Replace the previous two-editor comparison with the approved classic Microsoft Notepad description.
+- Synchronize application, AppImage, Windows, Suite component, AppStream, documentation, and release-gate identity to 2.2.8.
+
+## 2.1.0-r2
+
+- Packaging-metadata hotfix: add the required AppStream release date (`2026-09-24`) for the current release.
+- Expand the first AppStream description paragraph so validation no longer reports `description-first-para-too-short`.
+- Add release-gate coverage for the current AppStream release date and minimum description length.
+- No editor, workflow, routing, printing, or UI behavior changes beyond the synchronized revision identity.
+
+## 2.1.0-r1
+
+- Packaging-only hotfix: corrected the PyInstaller build-requirements file so the build-only dependency is installed in the isolated AppImage environment.
+- Added release-gate coverage for malformed literal `\n` sequences in the build requirements.
+- No editor, workflow, routing, printing, or UI behavior changes.
+
+## 2.1.0
+
+- Harmonised the source tree around project-root `main.py` plus `nuxpad2/`.
+- Rebased Fedora AppImage packaging onto the hardened non-privileged Pythoine contract.
+- Added Suite Pythoine component metadata and modern Desktop/AppStream metadata.
+- Kept Nuxpad-specific QtPrintSupport/printing behavior; no QtPdf reader dependency was introduced.
+- Aligned About and the slogan to **Friendly. Fast. Focused.**
+- Preserved the 2.0.0-rc5.1 editor behavior and cross-platform configuration paths.
+
+
 ## 2.0.0-rc5.1
 
 - Correct Windows organisation, AppUserModelID, QCoreApplication organisation,

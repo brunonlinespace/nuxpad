@@ -1,5 +1,5 @@
-# Feature freeze
+# Nuxpad 2 feature-freeze status
 
-Nuxpad 2.0.0-rc5.1 is feature frozen.
+Nuxpad 2.2.8 preserves the established plain-text editor workflow.
 
-Before 2.0.0, accept only confirmed regressions, crashes, data-loss/content-integrity defects, accessibility corrections, performance corrections, packaging blockers, and documentation corrections.
+The 2.2.8 work is limited to the approved AppMenu presentation changes, Date/Time ordering, Display Font label, repository/About alignment, and synchronized release identity. No unrelated editor features are introduced.

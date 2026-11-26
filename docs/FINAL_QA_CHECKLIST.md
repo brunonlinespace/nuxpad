@@ -1,9 +1,9 @@
-# Nuxpad 2.0.0-rc5.1 — Final QA Checklist
+# Nuxpad 2.2.8 — Final QA Checklist
 
 ## Launch and configuration
 
 - [ ] Launch from source on the primary Fedora test system
-- [ ] Confirm About shows version 2.0.0-rc1
+- [ ] Confirm About shows version 2.2.8
 - [ ] Confirm configuration is written to:
       `~/.config/brunonlinespace/nuxpad2/nuxpad.json`
 - [ ] Confirm migration from older configuration locations
@@ -37,9 +37,9 @@
 - [ ] Cut / Copy / Paste / Select All
 - [ ] List: Ctrl+L
 - [ ] Rename: Ctrl+Alt+R
+- [ ] Date + Time: F5
 - [ ] Date: Ctrl+D
 - [ ] Time: Ctrl+T
-- [ ] Date + Time: F5
 - [ ] Find: Ctrl+F
 - [ ] Go To Line: Ctrl+G
 - [ ] Replace: Ctrl+H
@@ -56,7 +56,12 @@
 - [ ] User font changes affect only document text
 - [ ] Symbols popup inserts characters and restores focus
 - [ ] More Symbols opens an available character-map utility
+- [ ] AppMenu actions display no icons
+- [ ] Edit menu order is Date + Time → Date → Time
+- [ ] View shows Display Font… (not Font…)
 - [ ] View menu spacing and labels are correct
+- [ ] About uses the approved classic Microsoft Notepad description
+- [ ] About repository link is https://github.com/brunonlinespace/nuxpad
 
 ## Encoding and content safety
 
