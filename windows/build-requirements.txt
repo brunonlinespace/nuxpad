@@ -1,2 +1,0 @@
-PyInstaller>=6.21,<7
-PyQt6>=6.9,<7
