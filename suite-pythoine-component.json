@@ -1,0 +1,28 @@
+{
+  "id": "nuxpad",
+  "name": "Nuxpad 2",
+  "description": "A lightweight general-purpose text editor.",
+  "component_kind": "editor",
+  "extensions": [
+    ".txt",
+    ".log",
+    ".ini",
+    ".cfg",
+    ".conf"
+  ],
+  "portable_command": [
+    "main.py"
+  ],
+  "icon": "nuxpad2/assets/icons/nuxpad.png",
+  "version": "2.2.8",
+  "publisher": "brunonlinespace",
+  "repository": "https://github.com/brunonlinespace/nuxpad",
+  "desktop_id": "io.github.brunonlinespace.nuxpad",
+  "tagline": "Friendly. Fast. Focused.",
+  "publisher_id": "brunonlinespace",
+  "capabilities": {
+    "routing": true,
+    "open": true,
+    "create": true
+  }
+}

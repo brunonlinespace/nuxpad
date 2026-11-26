@@ -1,7 +1,7 @@
 <p align="center">
-  <a href="https://github.com/brunonlinespace/nuxpad.py">
+  <a href="https://github.com/brunonlinespace/nuxpad">
     <img
-      src="assets/icons/nuxpad-about.png"
+      src="nuxpad2/assets/icons/nuxpad-about.png"
       alt="Nuxpad 2"
       width="256"
     >
@@ -10,13 +10,13 @@
 
 # Nuxpad 2
 
-**Simple. Fast. Focused.**
+**Friendly. Fast. Focused.**
 
 Nuxpad 2 is a lightweight plain-text editor for Linux and Windows, built with Python and PyQt6 from one shared source. It focuses on ordinary text files, fast editing, straightforward navigation, and careful preservation of file encoding and line endings without introducing a private document format.
 
-Current release candidate: **2.0.0-rc5.1**
+Current release: **2.2.8**
 
-Repository: <https://github.com/brunonlinespace/nuxpad.py>
+Repository: <https://github.com/brunonlinespace/nuxpad>
 
 ## What Nuxpad is
 
@@ -48,8 +48,9 @@ Save As defaults extensionless names to `.txt`, while explicit extensions such a
 - Atomic ordinary-file saves with secure temporary files.
 - SHA-256 based detection of files changed externally before Nuxpad overwrites them.
 - Configurable print-only **headers and footers** with filename, page, date, time, application, and confidentiality placeholders.
-- Linux AppImage-only **Dark / Light** Breeze-inspired styling.
-- Windows continues to use its normal host Qt appearance.
+- **Dark / Light** application shell themes across supported builds.
+- Optional **Chicago95/Raleigh** Retro styling: Chicago95 in Light, Raleigh-derived styling in Dark.
+- Independent **Dark Editor** canvas setting, separate from the application shell theme.
 
 ## Interface
 
@@ -76,9 +77,9 @@ Nuxpad keeps its command structure intentionally compact:
 - **Cut**
 - **Copy**
 - **Paste**
-- **Date**
-- **Time**
 - **Date + Time**
+- **Date Only**
+- **Time Only**
 - **Select All**
 - **Go To Line…**
 - **Replace…**
@@ -87,25 +88,32 @@ Find is available directly from the search field and with **Ctrl+F**.
 
 ### View
 
-- **Word Wrap**
-- **Line Numbers**
 - **Menu Only**
 - **Status Bar**
-- **Layout**
-  - Inline — Top
-  - Inline — Bottom
-  - Split — Toolbar Up / Search Down
-  - Split — Toolbar Down / Search Top
-- **Behaviour**
-  - Drag and drop opens on active window
-  - Drag and drop opens on new window
-- **Dark Mode** — Linux AppImage only
-- **Font…**
+- **Word Wrap**
+- **Line Numbers**
+- **Dark Editor**
+- **Layout** — mutually exclusive radio choices
+  - ○ Inline — Top
+  - ○ Inline — Bottom
+  - ○ Split — Toolbar Up / Search Down
+  - ○ Split — Toolbar Down / Search Top
+- **Drag-and-Drop** — mutually exclusive radio choices
+  - ○ Opens on Active Window
+  - ○ Opens on New Window
+- **Theme**
+  - ○ Dark
+  - ○ Light
+  - ✓ Chicago95/Raleigh — toggles the Retro style apparatus on or off
+- **Display Font…**
 
 ### Help
 
+- **Documentation**
 - **Keyboard Shortcuts**
-- **About Nuxpad**
+- **GitHub Repository**
+- **Raise an Issue**
+- **About Nuxpad 2**
 
 The main editing surface also provides dedicated **`• List`** and **`† Symbols`** buttons.
 
@@ -161,10 +169,10 @@ This protects against blindly overwriting another program's changes.
 
 Nuxpad accepts local files dropped into the application.
 
-**View → Behaviour** chooses between:
+**View → Drag-and-Drop** chooses between:
 
-- **Drag and drop opens on active window**
-- **Drag and drop opens on new window**
+- ○ **Opens on Active Window**
+- ○ **Opens on New Window**
 
 In active-window mode, Nuxpad uses the normal unsaved-changes prompt before replacing the current document. When several accepted files are dropped together, the first uses the active window and the remaining files open in new windows.
 
@@ -227,24 +235,29 @@ Headers and footers affect printed output only; they are not inserted into the t
 
 ## Appearance
 
-Portable Linux and Windows builds use the host Qt appearance.
+Nuxpad uses its own application-shell theme on supported builds while leaving external operating-system dialogs native and unthemed.
 
-The Linux AppImage additionally includes lightweight Breeze-inspired dark and light stylesheets. Use:
+A fresh configuration starts with the **modern LinSpectacles style**, **Dark** selected, and **Chicago95/Raleigh** turned off. The **Dark Editor** canvas is also on by default and remains independent of the shell theme.
 
-**View → Dark Mode**
+**View → Theme** uses two different kinds of selector:
 
-- checked — dark AppImage theme;
-- unchecked — light AppImage theme.
+- ○ **Dark** and ○ **Light** are mutually exclusive theme variants.
+- ✓ **Chicago95/Raleigh** is a checkmark because it activates or deactivates the Retro style apparatus; it is not a third theme variant.
 
-The AppImage theme also adjusts menu and search icon contrast for the selected light or dark appearance.
+The resulting combinations are:
 
-One-launch overrides are available:
+| Chicago95/Raleigh | Theme | Result |
+| --- | --- | --- |
+| Off | Dark | LinSpectacles Dark |
+| Off | Light | LinSpectacles Light |
+| On | Dark | Raleigh-derived Retro Dark |
+| On | Light | Chicago95 Light |
 
-```bash
-./Nuxpad-2.0.0-rc5.1-x86_64.AppImage --appimage-theme=dark
-./Nuxpad-2.0.0-rc5.1-x86_64.AppImage --appimage-theme=light
-./Nuxpad-2.0.0-rc5.1-x86_64.AppImage --appimage-theme=system
-```
+The Retro styles are based on [Chicago95](https://github.com/grassmunk/chicago95) and [Raleigh](https://github.com/thesquash/gtk-theme-raleigh).
+
+**View → Dark Editor** independently switches the editor canvas between dark and light without changing the application shell.
+
+The default interface state is **Menu Only on**, **Status Bar on**, **Word Wrap on**, **Line Numbers on**, **Inline — Top** layout, and **Drag-and-Drop → Opens on Active Window**. The default display font is **Sans Serif 11**, normal/roman.
 
 ## Useful keyboard shortcuts
 
@@ -254,7 +267,8 @@ One-launch overrides are available:
 | `Ctrl+O` | Open |
 | `Ctrl+S` | Save |
 | `Ctrl+Shift+S` | Save As |
-| `Ctrl+Alt+R` | Rename |
+| `F2` | Rename |
+| `Ctrl+Shift+P` | Page Setup |
 | `Ctrl+P` | Print |
 | `Ctrl+Shift+N` | New Window |
 | `Ctrl+Q` | Exit |
@@ -265,12 +279,18 @@ One-launch overrides are available:
 | `Ctrl+V` | Paste |
 | `Ctrl+A` | Select All |
 | `Ctrl+L` | List |
-| `Ctrl+D` | Date |
-| `Ctrl+T` | Time |
 | `F5` | Date + Time |
+| `Ctrl+;` | Date Only |
+| `Ctrl+:` | Time Only |
 | `Ctrl+F` | Find |
 | `Ctrl+G` | Go To Line |
 | `Ctrl+H` | Replace |
+| `Ctrl+Alt+Shift+M` | Menu Only |
+| `Ctrl+Alt+Shift+S` | Status Bar |
+| `Ctrl+Alt+Shift+W` | Word Wrap |
+| `Ctrl+Alt+Shift+L` | Line Numbers |
+| `Ctrl+Alt+Shift+E` | Dark Editor |
+| `F1` | Documentation |
 
 The current shortcut inventory is also available from **Help → Keyboard Shortcuts**.
 
@@ -278,59 +298,65 @@ The current shortcut inventory is also available from **Help → Keyboard Shortc
 
 Nuxpad requires **Python 3** and **PyQt6** on the host.
 
+From the repository root:
+
 Linux:
 
 ```bash
-./portable/run-nuxpad.sh
+./nuxpad2/portable/run-nuxpad.sh
 ```
 
-or:
+or directly:
 
 ```bash
-python3 source/nuxpad.py
+python3 main.py
 ```
 
 Windows Command Prompt:
 
 ```bat
-portable\run-nuxpad.cmd
+nuxpad2\portable\run-nuxpad.cmd
 ```
 
 Windows PowerShell:
 
 ```powershell
-.\portable\run-nuxpad.ps1
+.\nuxpad2\portable\run-nuxpad.ps1
 ```
 
-The source-portable form uses the host Qt theme.
+All source forms use the same Nuxpad application and theme system.
 
 ## Building the Linux AppImage
 
-The RC5.1 AppImage builder targets **x86_64** and checks for **Fedora 43 or Fedora 44** by default.
+The Fedora AppImage builder supports native **x86_64** and **aarch64** builds and is validated on **Fedora 43 and Fedora 44**. Cross-building between architectures is intentionally unsupported.
+
+From the repository root:
 
 ```bash
-chmod +x appimage/build-fedora-appimage.sh
-./appimage/build-fedora-appimage.sh
+chmod +x nuxpad2/packaging/fedora/build-appimage.sh
+./nuxpad2/packaging/fedora/build-appimage.sh
 ```
 
-Expected outputs include:
+Expected outputs are written under `nuxpad2/dist/` for the current host architecture, including:
 
 ```text
-dist/Nuxpad-2.0.0-rc5.1-x86_64.AppImage
-dist/Nuxpad-2.0.0-rc5.1-x86_64.AppImage.sha256
-dist/Nuxpad-2.0.0-rc5.1-x86_64.build-info.txt
-dist/Nuxpad-2.0.0-rc5.1-x86_64.build-python-lock.txt
+nuxpad2/dist/Nuxpad-2.2.8-<arch>.AppImage
+nuxpad2/dist/Nuxpad-2.2.8-<arch>.AppImage.sha256
+nuxpad2/dist/Nuxpad-2.2.8-<arch>.build-info.txt
+nuxpad2/dist/Nuxpad-2.2.8-<arch>.build-python-lock.txt
 ```
 
-The builder creates an isolated Python environment, freezes the one canonical application source with PyInstaller, assembles the AppDir, validates important Qt components, performs an off-screen smoke test, and records build information.
+The builder creates an isolated Python environment, freezes the canonical application source with PyInstaller, assembles the AppDir, validates important Qt components, performs smoke checks, and records build information.
 
 ## Building the Windows portable package
 
-RC5.1 includes a PowerShell/PyInstaller helper for a self-contained **Windows x64** folder package.
+Nuxpad includes a PowerShell/PyInstaller helper for a self-contained **Windows x64** folder package.
+
+From the repository root:
 
 ```powershell
 Set-ExecutionPolicy -Scope Process Bypass
-.\windows\build-windows-portable.ps1
+.\nuxpad2\windows\build-windows-portable.ps1
 ```
 
 The packaging format is a portable folder plus ZIP. It does not install file associations or create application registry entries.
@@ -349,15 +375,15 @@ Windows:
 %APPDATA%\brunonlinespace\Nuxpad2\nuxpad.json
 ```
 
-Preferences include interface layout, word wrap, line numbers, status-bar visibility, drag-and-drop behaviour, editor font, print header/footer settings, and the AppImage theme choice where applicable.
+Preferences include interface layout, word wrap, line numbers, status-bar visibility, drag-and-drop behaviour, Dark/Light application theme, the Chicago95/Raleigh Retro-style toggle, the independent Dark Editor setting, display font, and print header/footer settings.
 
-## Current release-candidate targets
+## Current supported build targets
 
-- Fedora 43
-- Fedora 44
-- Windows 11 x64
+- Fedora 43 — native x86_64 or aarch64 AppImage build
+- Fedora 44 — native x86_64 or aarch64 AppImage build
+- Windows 11 x64 — portable package
 
-The source tree also records planned compatibility expansion separately from the current release-candidate targets.
+The source tree also records planned compatibility expansion separately from these current validated build targets.
 
 ## Scope
 
@@ -373,7 +399,7 @@ See `LICENSE` for the complete licence text.
 
 ## Links
 
-- Nuxpad 2: <https://github.com/brunonlinespace/nuxpad.py>
+- Nuxpad 2: <https://github.com/brunonlinespace/nuxpad>
 - GitHub profile: <https://github.com/brunonlinespace/>
 
 Copyright © 2026 Bruno Machado.
