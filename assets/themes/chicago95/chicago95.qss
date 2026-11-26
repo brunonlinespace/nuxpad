@@ -1,0 +1,298 @@
+/*
+ * Nuxpad Chicago95 Qt adaptation
+ * Visual authority: bundled Chicago95 GTK3 theme by the Chicago95 project.
+ * Original theme source/assets are retained under original/.
+ */
+
+QWidget {
+    background-color: #c0c0c0;
+    color: #000000;
+    selection-background-color: #000080;
+    selection-color: #ffffff;
+}
+
+QMainWindow, QDialog, QMessageBox { background-color: #c0c0c0; }
+
+QMenuBar {
+    background-color: #c0c0c0;
+    color: #000000;
+    border: 0px;
+    spacing: 0px;
+}
+QMenuBar::item {
+    background: transparent;
+    padding: 3px 7px;
+}
+QMenuBar::item:selected, QMenuBar::item:pressed {
+    background-color: #000080;
+    color: #ffffff;
+}
+QMenu {
+    background-color: #c0c0c0;
+    color: #000000;
+    border-top: 2px solid #ffffff;
+    border-left: 2px solid #ffffff;
+    border-right: 2px solid #000000;
+    border-bottom: 2px solid #000000;
+    padding: 2px;
+}
+QMenu::item {
+    background: transparent;
+    padding: 3px 24px 3px 20px;
+    min-height: 16px;
+}
+QMenu::item:selected {
+    background-color: #000080;
+    color: #ffffff;
+}
+QMenu::item:disabled { color: #808080; }
+QMenu::separator {
+    height: 2px;
+    margin: 3px 2px;
+    background: #808080;
+    border-bottom: 1px solid #ffffff;
+}
+QMenu::indicator { width: 16px; height: 16px; }
+QMenu::indicator:non-exclusive:checked {
+    image: url("__CHICAGO95_ROOT__/original/gtk-3.0/assets/checkbox-checked.png");
+}
+QMenu::indicator:exclusive:unchecked {
+    image: url("__CHICAGO95_ROOT__/original/gtk-3.0/assets/radio-unselected.png");
+}
+QMenu::indicator:exclusive:checked {
+    image: url("__CHICAGO95_ROOT__/original/gtk-3.0/assets/radio-selected.png");
+}
+QMenu::indicator:exclusive:unchecked:disabled {
+    image: url("__CHICAGO95_ROOT__/original/gtk-3.0/assets/radio-unselected-insensitive.png");
+}
+QMenu::indicator:exclusive:checked:disabled {
+    image: url("__CHICAGO95_ROOT__/original/gtk-3.0/assets/radio-selected-insensitive.png");
+}
+QMenu::right-arrow {
+    image: url("__CHICAGO95_ROOT__/original/gtk-3.0/assets/arrow-right.png");
+    width: 10px; height: 10px;
+}
+QMenu::right-arrow:selected {
+    image: url("__CHICAGO95_ROOT__/original/gtk-3.0/assets/arrow-right-selected.png");
+}
+
+QPushButton, QToolButton {
+    background-color: #c0c0c0;
+    color: #000000;
+    border-top: 2px solid #ffffff;
+    border-left: 2px solid #ffffff;
+    border-right: 2px solid #000000;
+    border-bottom: 2px solid #000000;
+    border-radius: 0px;
+    padding: 3px 7px;
+    min-height: 18px;
+}
+QPushButton:hover, QToolButton:hover { background-color: #c0c0c0; }
+QPushButton:pressed, QToolButton:pressed,
+QPushButton:checked, QToolButton:checked {
+    border-top: 2px solid #000000;
+    border-left: 2px solid #000000;
+    border-right: 2px solid #ffffff;
+    border-bottom: 2px solid #ffffff;
+    padding-left: 8px;
+    padding-top: 4px;
+}
+QPushButton:focus, QToolButton:focus { outline: 1px dotted #000000; }
+QPushButton:disabled, QToolButton:disabled { color: #808080; }
+QToolButton::menu-indicator { image: none; width: 0px; }
+
+QLineEdit, QTextEdit, QPlainTextEdit, QAbstractItemView {
+    background-color: #ffffff;
+    color: #000000;
+    border-top: 2px solid #808080;
+    border-left: 2px solid #808080;
+    border-right: 2px solid #ffffff;
+    border-bottom: 2px solid #ffffff;
+    border-radius: 0px;
+    selection-background-color: #000080;
+    selection-color: #ffffff;
+}
+QLineEdit:disabled, QTextEdit:disabled, QPlainTextEdit:disabled {
+    background-color: #c0c0c0;
+    color: #808080;
+}
+QAbstractItemView::item:selected {
+    background-color: #000080;
+    color: #ffffff;
+}
+
+QComboBox {
+    background-color: #ffffff;
+    color: #000000;
+    border-top: 2px solid #808080;
+    border-left: 2px solid #808080;
+    border-right: 2px solid #ffffff;
+    border-bottom: 2px solid #ffffff;
+    border-radius: 0px;
+    padding: 2px 22px 2px 4px;
+    min-height: 18px;
+}
+QComboBox::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    width: 18px;
+    background: #c0c0c0;
+    border-left: 1px solid #808080;
+    border-top: 1px solid #ffffff;
+    border-right: 1px solid #000000;
+    border-bottom: 1px solid #000000;
+}
+QComboBox::down-arrow {
+    image: url("__CHICAGO95_ROOT__/original/gtk-3.0/assets/vcl-combobox-arrow-down.png");
+    width: 12px; height: 12px;
+}
+
+QCheckBox, QRadioButton { spacing: 4px; background: transparent; }
+QCheckBox::indicator { width: 16px; height: 16px; }
+QCheckBox::indicator:unchecked {
+    image: url("__CHICAGO95_ROOT__/original/gtk-3.0/assets/checkbox-unchecked.png");
+}
+QCheckBox::indicator:checked {
+    image: url("__CHICAGO95_ROOT__/original/gtk-3.0/assets/checkbox-checked.png");
+}
+QCheckBox::indicator:unchecked:disabled {
+    image: url("__CHICAGO95_ROOT__/original/gtk-3.0/assets/checkbox-unchecked-insensitive.png");
+}
+QCheckBox::indicator:checked:disabled {
+    image: url("__CHICAGO95_ROOT__/original/gtk-3.0/assets/checkbox-checked-insensitive.png");
+}
+QRadioButton::indicator { width: 16px; height: 16px; }
+QRadioButton::indicator:unchecked {
+    image: url("__CHICAGO95_ROOT__/original/gtk-3.0/assets/radio-unselected.png");
+}
+QRadioButton::indicator:checked {
+    image: url("__CHICAGO95_ROOT__/original/gtk-3.0/assets/radio-selected.png");
+}
+QRadioButton::indicator:unchecked:disabled {
+    image: url("__CHICAGO95_ROOT__/original/gtk-3.0/assets/radio-unselected-insensitive.png");
+}
+QRadioButton::indicator:checked:disabled {
+    image: url("__CHICAGO95_ROOT__/original/gtk-3.0/assets/radio-selected-insensitive.png");
+}
+
+QGroupBox {
+    border-top: 1px solid #808080;
+    border-left: 1px solid #808080;
+    border-right: 1px solid #ffffff;
+    border-bottom: 1px solid #ffffff;
+    border-radius: 0px;
+    margin-top: 9px;
+    padding-top: 6px;
+}
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top left;
+    left: 8px;
+    padding: 0px 3px;
+    background-color: #c0c0c0;
+    color: #000000;
+}
+
+QStatusBar {
+    background-color: #c0c0c0;
+    color: #000000;
+    border-top: 1px solid #808080;
+}
+QStatusBar::item { border: 0px; }
+QStatusBar QLabel {
+    background-color: #c0c0c0;
+    color: #000000;
+    border-top: 1px solid #808080;
+    border-left: 1px solid #808080;
+    border-right: 1px solid #ffffff;
+    border-bottom: 1px solid #ffffff;
+    padding: 1px 3px;
+}
+
+QScrollBar:vertical {
+    background: #ffffff;
+    width: 16px;
+    margin: 16px 0px 16px 0px;
+    border: 0px;
+}
+QScrollBar::handle:vertical {
+    min-height: 18px;
+    background: #c0c0c0;
+    border-top: 2px solid #ffffff;
+    border-left: 2px solid #ffffff;
+    border-right: 2px solid #000000;
+    border-bottom: 2px solid #000000;
+}
+QScrollBar::sub-line:vertical {
+    subcontrol-origin: margin; subcontrol-position: top;
+    height: 16px;
+    background: #c0c0c0;
+    image: url("__CHICAGO95_ROOT__/original/gtk-3.0/scrollbar/stepper-up.png");
+}
+QScrollBar::add-line:vertical {
+    subcontrol-origin: margin; subcontrol-position: bottom;
+    height: 16px;
+    background: #c0c0c0;
+    image: url("__CHICAGO95_ROOT__/original/gtk-3.0/scrollbar/stepper-down.png");
+}
+QScrollBar::sub-line:vertical:pressed {
+    image: url("__CHICAGO95_ROOT__/original/gtk-3.0/scrollbar/stepper-up-active.png");
+}
+QScrollBar::add-line:vertical:pressed {
+    image: url("__CHICAGO95_ROOT__/original/gtk-3.0/scrollbar/stepper-down-active.png");
+}
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical { background: #dfdfdf; }
+
+QScrollBar:horizontal {
+    background: #ffffff;
+    height: 16px;
+    margin: 0px 16px 0px 16px;
+    border: 0px;
+}
+QScrollBar::handle:horizontal {
+    min-width: 18px;
+    background: #c0c0c0;
+    border-top: 2px solid #ffffff;
+    border-left: 2px solid #ffffff;
+    border-right: 2px solid #000000;
+    border-bottom: 2px solid #000000;
+}
+QScrollBar::sub-line:horizontal {
+    subcontrol-origin: margin; subcontrol-position: left;
+    width: 16px;
+    background: #c0c0c0;
+    image: url("__CHICAGO95_ROOT__/original/gtk-3.0/scrollbar/stepper-left.png");
+}
+QScrollBar::add-line:horizontal {
+    subcontrol-origin: margin; subcontrol-position: right;
+    width: 16px;
+    background: #c0c0c0;
+    image: url("__CHICAGO95_ROOT__/original/gtk-3.0/scrollbar/stepper-right.png");
+}
+QScrollBar::sub-line:horizontal:pressed {
+    image: url("__CHICAGO95_ROOT__/original/gtk-3.0/scrollbar/stepper-left-active.png");
+}
+QScrollBar::add-line:horizontal:pressed {
+    image: url("__CHICAGO95_ROOT__/original/gtk-3.0/scrollbar/stepper-right-active.png");
+}
+QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal { background: #dfdfdf; }
+
+QToolTip {
+    background-color: #ffffe1;
+    color: #000000;
+    border: 1px solid #000000;
+    border-radius: 0px;
+    padding: 2px;
+}
+
+QFrame[frameShape="4"], QFrame[frameShape="5"] { color: #808080; }
+
+QDialogButtonBox QPushButton { min-width: 70px; }
+
+#searchContainer, #bottomSearch { background-color: #c0c0c0; }
+#editor {
+    background-color: #ffffff;
+    color: #000000;
+    selection-background-color: #000080;
+    selection-color: #ffffff;
+}
