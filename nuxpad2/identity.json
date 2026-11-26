@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "component_id": "nuxpad",
+  "name": "Nuxpad 2",
+  "developer": "brunonlinespace",
+  "package": "nuxpad2",
+  "executable": "nuxpad",
+  "appstream_id": "io.github.brunonlinespace.nuxpad",
+  "desktop_file": "io.github.brunonlinespace.nuxpad.desktop",
+  "source_archive_pattern": "Nuxpad-*-source.zip",
+  "config_relative": "brunonlinespace/nuxpad2/nuxpad.json"
+}
