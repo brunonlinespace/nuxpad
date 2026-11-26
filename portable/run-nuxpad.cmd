@@ -1,4 +1,4 @@
 @echo off
 setlocal
-set "ROOT=%~dp0.."
-python "%ROOT%\source\nuxpad.py" %*
+set "PROJECT_ROOT=%~dp0..\.."
+python "%PROJECT_ROOT%\main.py" %*
