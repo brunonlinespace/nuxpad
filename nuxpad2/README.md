@@ -1,4 +1,4 @@
-# Nuxpad 2.2.8
+# Nuxpad 2.3.4
 
 **Friendly. Fast. Focused.**
 
