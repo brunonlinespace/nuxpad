@@ -14,7 +14,7 @@
     "main.py"
   ],
   "icon": "nuxpad2/assets/icons/nuxpad.png",
-  "version": "2.2.8",
+  "version": "2.3.4",
   "publisher": "brunonlinespace",
   "repository": "https://github.com/brunonlinespace/nuxpad",
   "desktop_id": "io.github.brunonlinespace.nuxpad",

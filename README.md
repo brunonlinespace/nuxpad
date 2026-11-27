@@ -14,7 +14,7 @@
 
 Nuxpad 2 is a lightweight plain-text editor for Linux and Windows, built with Python and PyQt6 from one shared source. It focuses on ordinary text files, fast editing, straightforward navigation, and careful preservation of file encoding and line endings without introducing a private document format.
 
-Current release: **2.2.8**
+Current release: **2.3.4**
 
 Repository: <https://github.com/brunonlinespace/nuxpad>
 
@@ -50,7 +50,7 @@ Save As defaults extensionless names to `.txt`, while explicit extensions such a
 - Configurable print-only **headers and footers** with filename, page, date, time, application, and confidentiality placeholders.
 - **Dark / Light** application shell themes across supported builds.
 - Optional **Chicago95/Raleigh** Retro styling: Chicago95 in Light, Raleigh-derived styling in Dark.
-- Independent **Dark Editor** canvas setting, separate from the application shell theme.
+- Independent **Editor Colours** presets, separate from the application shell theme.
 
 ## Interface
 
@@ -65,6 +65,7 @@ Nuxpad keeps its command structure intentionally compact:
 - **Save**
 - **Save As…**
 - **Rename…**
+- **Properties**
 - **Page Setup…**
 - **Print…**
 - **New Window**
@@ -77,14 +78,17 @@ Nuxpad keeps its command structure intentionally compact:
 - **Cut**
 - **Copy**
 - **Paste**
+- **List**
+- **Symbols…** — `Shift+F5`
 - **Date + Time**
 - **Date Only**
 - **Time Only**
 - **Select All**
+- **Find**
 - **Go To Line…**
 - **Replace…**
 
-Find is available directly from the search field and with **Ctrl+F**.
+The main editing surface also keeps the dedicated **`• List`** and **`† Symbols`** buttons, while **Find** focuses the existing search field.
 
 ### View
 
@@ -92,20 +96,30 @@ Find is available directly from the search field and with **Ctrl+F**.
 - **Status Bar**
 - **Word Wrap**
 - **Line Numbers**
-- **Dark Editor**
-- **Layout** — mutually exclusive radio choices
-  - ○ Inline — Top
-  - ○ Inline — Bottom
-  - ○ Split — Toolbar Up / Search Down
-  - ○ Split — Toolbar Down / Search Top
-- **Drag-and-Drop** — mutually exclusive radio choices
-  - ○ Opens on Active Window
-  - ○ Opens on New Window
-- **Theme**
+- **Editor Colours** — mutually exclusive radio choices
+  - ○ Nuxpad Dark
+  - ○ Nuxpad Light
+  - ○ White on Black
+  - ○ Black on White
+  - ○ Green on Black
+  - ○ Amber on Black
+  - ○ White on Blue
+  - ○ Blue on Cyan
+  - ○ Green on Dark Green
+  - ○ Salmon on Red Brown
+- **Editor Layout** — mutually exclusive radio choices
+  - ○ Toolbar Top / Find Bottom — `Ctrl+1` — default
+  - ○ Toolbar Top / Find In-line — `Ctrl+2`
+  - ○ Toolbar Bottom / Find Top — `Ctrl+3`
+  - ○ Toolbar Bottom / Find In-line — `Ctrl+4`
+- **Editor Font…**
+- **App Theme**
   - ○ Dark
   - ○ Light
   - ✓ Chicago95/Raleigh — toggles the Retro style apparatus on or off
-- **Display Font…**
+- **App Drag-and-Drop** — mutually exclusive radio choices
+  - ○ Opens on Active Window
+  - ○ Opens on New Window
 
 ### Help
 
@@ -115,7 +129,6 @@ Find is available directly from the search field and with **Ctrl+F**.
 - **Raise an Issue**
 - **About Nuxpad 2**
 
-The main editing surface also provides dedicated **`• List`** and **`† Symbols`** buttons.
 
 ## Search and replace
 
@@ -169,7 +182,7 @@ This protects against blindly overwriting another program's changes.
 
 Nuxpad accepts local files dropped into the application.
 
-**View → Drag-and-Drop** chooses between:
+**View → App Drag-and-Drop** chooses between:
 
 - ○ **Opens on Active Window**
 - ○ **Opens on New Window**
@@ -237,9 +250,9 @@ Headers and footers affect printed output only; they are not inserted into the t
 
 Nuxpad uses its own application-shell theme on supported builds while leaving external operating-system dialogs native and unthemed.
 
-A fresh configuration starts with the **modern LinSpectacles style**, **Dark** selected, and **Chicago95/Raleigh** turned off. The **Dark Editor** canvas is also on by default and remains independent of the shell theme.
+A fresh configuration starts with the **modern LinSpectacles style**, **Dark** selected, and **Chicago95/Raleigh** turned off. The **Nuxpad Dark** editor colour scheme is also selected by default and remains independent of the shell theme.
 
-**View → Theme** uses two different kinds of selector:
+**View → App Theme** uses two different kinds of selector:
 
 - ○ **Dark** and ○ **Light** are mutually exclusive theme variants.
 - ✓ **Chicago95/Raleigh** is a checkmark because it activates or deactivates the Retro style apparatus; it is not a third theme variant.
@@ -255,9 +268,9 @@ The resulting combinations are:
 
 The Retro styles are based on [Chicago95](https://github.com/grassmunk/chicago95) and [Raleigh](https://github.com/thesquash/gtk-theme-raleigh).
 
-**View → Dark Editor** independently switches the editor canvas between dark and light without changing the application shell.
+**View → Editor Colours** independently selects the editor canvas colour pair without changing the application shell. **Nuxpad Dark** retains the established dark canvas, while **Nuxpad Light** uses the established `#202020` foreground on a softer `#f3f3f3` background. **Black on White** provides the separate stark `#000000` on `#ffffff` pair; the other presets provide additional foreground/background combinations.
 
-The default interface state is **Menu Only on**, **Status Bar on**, **Word Wrap on**, **Line Numbers on**, **Inline — Top** layout, and **Drag-and-Drop → Opens on Active Window**. The default display font is **Sans Serif 11**, normal/roman.
+The default interface state is **Menu Only on**, **Status Bar on**, **Word Wrap on**, **Line Numbers on**, **Toolbar Top / Find Bottom** layout, and **App Drag-and-Drop → Opens on Active Window**. The default editor font is **Sans Serif 11**, normal/roman.
 
 ## Useful keyboard shortcuts
 
@@ -268,6 +281,7 @@ The default interface state is **Menu Only on**, **Status Bar on**, **Word Wrap 
 | `Ctrl+S` | Save |
 | `Ctrl+Shift+S` | Save As |
 | `F2` | Rename |
+| `F4` | Properties |
 | `Ctrl+Shift+P` | Page Setup |
 | `Ctrl+P` | Print |
 | `Ctrl+Shift+N` | New Window |
@@ -289,10 +303,13 @@ The default interface state is **Menu Only on**, **Status Bar on**, **Word Wrap 
 | `Ctrl+Alt+Shift+S` | Status Bar |
 | `Ctrl+Alt+Shift+W` | Word Wrap |
 | `Ctrl+Alt+Shift+L` | Line Numbers |
-| `Ctrl+Alt+Shift+E` | Dark Editor |
+| `Ctrl+1` | Toolbar Top / Find Bottom |
+| `Ctrl+2` | Toolbar Top / Find Top |
+| `Ctrl+3` | Toolbar Bottom / Find Top |
+| `Ctrl+4` | Toolbar Bottom / Find Bottom |
 | `F1` | Documentation |
 
-The current shortcut inventory is also available from **Help → Keyboard Shortcuts**.
+**Help → Keyboard Shortcuts** provides the live shortcut inventory in a searchable, menu-filtered dialog.
 
 ## Running from source
 
@@ -340,10 +357,10 @@ chmod +x nuxpad2/packaging/fedora/build-appimage.sh
 Expected outputs are written under `nuxpad2/dist/` for the current host architecture, including:
 
 ```text
-nuxpad2/dist/Nuxpad-2.2.8-<arch>.AppImage
-nuxpad2/dist/Nuxpad-2.2.8-<arch>.AppImage.sha256
-nuxpad2/dist/Nuxpad-2.2.8-<arch>.build-info.txt
-nuxpad2/dist/Nuxpad-2.2.8-<arch>.build-python-lock.txt
+nuxpad2/dist/Nuxpad-2.3.4-<arch>.AppImage
+nuxpad2/dist/Nuxpad-2.3.4-<arch>.AppImage.sha256
+nuxpad2/dist/Nuxpad-2.3.4-<arch>.build-info.txt
+nuxpad2/dist/Nuxpad-2.3.4-<arch>.build-python-lock.txt
 ```
 
 The builder creates an isolated Python environment, freezes the canonical application source with PyInstaller, assembles the AppDir, validates important Qt components, performs smoke checks, and records build information.
@@ -375,7 +392,7 @@ Windows:
 %APPDATA%\brunonlinespace\Nuxpad2\nuxpad.json
 ```
 
-Preferences include interface layout, word wrap, line numbers, status-bar visibility, drag-and-drop behaviour, Dark/Light application theme, the Chicago95/Raleigh Retro-style toggle, the independent Dark Editor setting, display font, and print header/footer settings.
+Preferences include interface layout, word wrap, line numbers, status-bar visibility, drag-and-drop behaviour, Dark/Light application theme, the Chicago95/Raleigh Retro-style toggle, the independent Editor Colours selection, display font, and print header/footer settings.
 
 ## Current supported build targets
 
