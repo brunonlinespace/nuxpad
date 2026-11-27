@@ -1,4 +1,4 @@
-# Nuxpad 2.2.8 Fedora AppImage build
+# Nuxpad 2.3.4 Fedora AppImage build
 
 Use:
 

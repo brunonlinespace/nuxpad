@@ -1,23 +1,40 @@
-# Nuxpad 2.2.8
+# Nuxpad 2.3.4
 
-Nuxpad 2.2.8 is a focused AppMenu, About, and release-identity alignment release based on 2.1.0-r2.
+Nuxpad 2.3.4 is a tightly scoped menu, shortcut-inventory, and document-information release based directly on 2.3.0.
 
-## Interface
+## File
 
-- Removes icons from all AppMenu actions while leaving non-menu interface icons unchanged.
-- Renames **Font…** to **Display Font…** in View.
-- Reorders the Edit menu insertion commands to **Date + Time → Date → Time**.
-- Mirrors that date/time order in the Keyboard Shortcuts dialog.
+- Adds **Properties** directly below **Rename…**.
+- Adds the **F4** shortcut.
+- Properties reports file location/details and current plain-text document information without modifying the document.
 
-## About and project identity
+## Edit
 
-- Updates the repository to <https://github.com/brunonlinespace/nuxpad>.
-- Replaces the previous two-editor comparison with the approved Notepad-only About description.
-- Sets the About description to: **“A lightweight text editor for Linux and Windows, inspired by the simplicity of the classic Microsoft Notepad.”**
+- Adds **List** and **Symbols** between Paste and Date + Time, separated as their own menu block.
+- Adds **Find** immediately before **Go To Line…**.
+- The existing `Ctrl+L` List and `Ctrl+F` Find shortcuts now belong to these live Edit-menu actions instead of separate hidden actions.
 
-## Release identity
+## View
 
-- Updates source, Suite component metadata, AppStream metadata, AppImage packaging, Windows packaging, and QA contracts to **2.2.8**.
-- AppStream current-release date is **2026-10-08**.
+- Keeps the existing View items through **Editor Colours**.
+- Renames and reorders the remaining blocks as:
+  - **Editor Layout**
+  - **Editor Font…**
+  - **App Theme**
+  - **App Drag-and-Drop**
+- Editor Layout now uses:
+  - **Toolbar Top / Find Bottom** — `Ctrl+1` — default
+  - **Toolbar Top / Find Top** — `Ctrl+2`
+  - **Toolbar Bottom / Find Top** — `Ctrl+3`
+  - **Toolbar Bottom / Find Bottom** — `Ctrl+4`
 
-No unrelated editor workflow or file-format behavior is changed.
+## Keyboard Shortcuts
+
+- Replaces the old hard-coded modal shortcut list with the searchable live QAction inventory pattern used by the other Pad editors.
+- The dialog is modeless and single-instance.
+- It provides **Command / Shortcut** columns, command/shortcut search, a **Menu:** filter, fuzzy shortcut matching, and a no-results state.
+- The inventory is collected recursively from Nuxpad's live File, Edit, View, and Help menus so menu shortcut changes stay synchronized automatically.
+
+## Scope
+
+No unrelated editor-engine, file-handling, search/replace, printing, theme, About, native-dialog, packaging, or source-tree behaviour is changed.

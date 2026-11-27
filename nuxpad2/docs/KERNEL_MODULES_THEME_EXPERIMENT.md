@@ -1,4 +1,4 @@
-# Nuxpad 2.2.8 — merged modern + Retro theme experiment
+# Nuxpad 2.3.4 — merged modern + Retro theme experiment
 
 x3.0 merges x2.6 with the Chicago95/Raleigh apparatus from x1.2.
 
@@ -30,7 +30,7 @@ the selected x2.6 shell is applied.
 
 ## Editor canvas
 
-View → Dark Editor Canvas remains independent in all four shell combinations.
+View → Editor Colours remains independent in all four shell combinations.
 Display Font remains document-only. The line-number font remains the original
 system UI font rather than the Retro program font.
 
@@ -47,7 +47,7 @@ drag-and-drop and window lifetime are unchanged.
 ## x3.2 menu/help/symbols alignment
 
 - View begins with Menu Only and Status Bar.
-- Word Wrap, Line Numbers and Dark Editor follow, with the new shortcuts.
+- Word Wrap and Line Numbers follow; Editor Colours is an exclusive submenu.
 - Behaviour is renamed Drag-and-Drop with shorter option labels.
 - Help now provides Documentation (F1), Keyboard Shortcuts, GitHub Repository,
   Raise an Issue, and About Nuxpad in the requested grouped order.
@@ -101,7 +101,7 @@ scrollbars.
   right/bottom, square corners.
 - Raleigh Dark frame: 2 px `#111111` top/left and 2 px `#434444`
   right/bottom, square corners.
-- Dark Editor remains independent for canvas fill/text.
+- Editor Colours remains independent for canvas fill/text.
 - Retro Dark uses Chicago95's 16 px checkbox/radio indicator assets and
   Chicago95 menu checkmark, matching Retro Light.
 - Raleigh continues to provide its dark palette and arrow/scrollbar artwork.

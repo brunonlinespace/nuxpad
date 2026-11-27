@@ -1,9 +1,9 @@
-# Nuxpad 2.2.8 — Final QA Checklist
+# Nuxpad 2.3.4 — Final QA Checklist
 
 ## Launch and configuration
 
 - [ ] Launch from source on the primary Fedora test system
-- [ ] Confirm About shows version 2.2.8
+- [ ] Confirm About shows version 2.3.4
 - [ ] Confirm configuration is written to:
       `~/.config/brunonlinespace/nuxpad2/nuxpad.json`
 - [ ] Confirm migration from older configuration locations
@@ -18,6 +18,7 @@
 - [ ] Rename updates the on-disk file, title bar, and status bar
 - [ ] Rename refuses folder paths
 - [ ] Rename replacement confirmation works
+- [ ] Properties opens from File below Rename and with F4
 - [ ] Unsaved-change Save / Discard / Cancel prompts work
 - [ ] New Window works
 - [ ] Multiple command-line files open correctly
@@ -43,11 +44,14 @@
 - [ ] Find: Ctrl+F
 - [ ] Go To Line: Ctrl+G
 - [ ] Replace: Ctrl+H
-- [ ] Keyboard Shortcuts dialog matches actual bindings
+- [ ] Keyboard Shortcuts dialog is modeless, searchable, menu-filtered, single-instance, and matches actual bindings
 
 ## Interface
 
-- [ ] All four layouts
+- [ ] Editor Layout: Toolbar Top / Find Bottom (Ctrl+1, default)
+- [ ] Editor Layout: Toolbar Top / Find Top (Ctrl+2)
+- [ ] Editor Layout: Toolbar Bottom / Find Top (Ctrl+3)
+- [ ] Editor Layout: Toolbar Bottom / Find Bottom (Ctrl+4)
 - [ ] Menu Only on and off
 - [ ] Status Bar on and off
 - [ ] Full path appears on the left of the status bar
@@ -57,8 +61,10 @@
 - [ ] Symbols popup inserts characters and restores focus
 - [ ] More Symbols opens an available character-map utility
 - [ ] AppMenu actions display no icons
-- [ ] Edit menu order is Date + Time → Date → Time
-- [ ] View shows Display Font… (not Font…)
+- [ ] Edit menu exposes List and Symbols between Paste and Date + Time, with separators
+- [ ] Edit menu exposes Find immediately before Go To Line
+- [ ] Date/time order remains Date + Time → Date → Time
+- [ ] View lower blocks are Editor Layout → Editor Font… → App Theme → App Drag-and-Drop
 - [ ] View menu spacing and labels are correct
 - [ ] About uses the approved classic Microsoft Notepad description
 - [ ] About repository link is https://github.com/brunonlinespace/nuxpad

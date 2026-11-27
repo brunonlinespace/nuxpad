@@ -1,6 +1,6 @@
 # Nuxpad 2 cross-platform architecture
 
-Nuxpad 2.2.8 uses one shared PyQt6 application implementation:
+Nuxpad 2.3.4 uses one shared PyQt6 application implementation:
 
 ```text
 nuxpad2/source/nuxpad.py

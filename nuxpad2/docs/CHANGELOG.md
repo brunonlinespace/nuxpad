@@ -1,5 +1,24 @@
 # Changelog
 
+## 2.3.4
+
+- Add **File → Properties** with `F4`.
+- Add **Edit → List**, **Edit → Symbols**, and **Edit → Find** in the agreed menu positions.
+- Replace the hard-coded Keyboard Shortcuts dialog with a searchable, menu-filtered live QAction inventory.
+- Reorder and relabel the lower View blocks as **Editor Layout**, **Editor Font…**, **App Theme**, and **App Drag-and-Drop**.
+- Relabel Editor Layout to the four Toolbar/Find positions, make **Toolbar Top / Find Bottom** the default, and bind them to `Ctrl+1` through `Ctrl+4`.
+- Synchronize current release identity to 2.3.4.
+- No unrelated editor-engine, theme, About, native-dialog, packaging, or source-tree changes.
+
+## 2.3.0
+
+- Replace **Dark Editor** with the exclusive **Editor Colours** submenu while preserving Nuxpad Dark/Light and adding the seven approved colour pairs.
+- Replace the Windows-folder README with the approved detailed build instructions.
+- Remove the temporary Windows build workspace after a fully successful build while retaining it on failure.
+- Keep only `Nuxpad.exe`, `_internal\`, and the master `README.md` visible at the Windows portable root; supporting documentation is bundled internally.
+- Synchronize current release identity to 2.3.0.
+- No unrelated editor-engine or application behaviour changes.
+
 ## 2.2.8
 
 - Remove all icons from AppMenu actions.
