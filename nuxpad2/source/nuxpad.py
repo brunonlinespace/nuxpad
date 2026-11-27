@@ -5,7 +5,7 @@
 #
 # GPLv3-or-later
 #
-# Version: 2.2.8 (Kernel Modules dark-theme experiment)
+# Version: 2.3.4 (Kernel Modules dark-theme experiment)
 # ==============================================================================
 
 import codecs
@@ -13,19 +13,23 @@ import json
 import hashlib
 import html
 import locale
+import re
 import os
 import shutil
 import subprocess
 import sys
 import tempfile
+from datetime import datetime
 from pathlib import Path
 
-from PyQt6.QtCore import QDateTime, QLocale, QRect, QRectF, QRegularExpression, QSize, QSizeF, QTimer, Qt, QUrl
+from PyQt6.QtCore import QDateTime, QEvent, QLocale, QRect, QRectF, QRegularExpression, QSize, QSizeF, QTimer, Qt, QUrl
 from PyQt6.QtGui import QAction, QActionGroup, QColor, QDesktopServices, QFont, QIcon, QKeySequence, QPainter, QPalette, QPixmap, QTextCharFormat, QTextCursor, QTextDocument
 from PyQt6.QtPrintSupport import QPrintDialog, QPrinter
 from PyQt6.QtWidgets import (
+    QAbstractItemView,
     QApplication,
     QCheckBox,
+    QComboBox,
     QDialog,
     QDialogButtonBox,
     QFileDialog,
@@ -47,13 +51,15 @@ from PyQt6.QtWidgets import (
     QStyle,
     QStyleFactory,
     QSizePolicy,
+    QTableWidget,
+    QTableWidgetItem,
     QToolButton,
     QVBoxLayout,
     QWidget,
 )
 
 APP_NAME = "Nuxpad 2"
-APP_VERSION = "2.2.8"
+APP_VERSION = "2.3.4"
 MAX_SEARCH_MATCHES = 10_000
 MAX_FILE_SIZE = 25 * 1024 * 1024  # 25 MiB responsiveness limit
 
@@ -61,6 +67,104 @@ KERNEL_MODULES_THEME_EXPERIMENT = True
 
 REPOSITORY_URL = "https://github.com/brunonlinespace/nuxpad"
 ISSUES_URL = "https://github.com/brunonlinespace/nuxpad/issues/new"
+
+EDITOR_COLOUR_SCHEMES = {
+    "nuxpad_dark": {
+        "label": "Nuxpad Dark",
+        "stylesheet": "editor-canvas-dark.qss",
+        "background": "#1e1e1e",
+        "foreground": "#dcdcdc",
+        "gutter_foreground": "#9a9a9a",
+    },
+    "nuxpad_light": {
+        "label": "Nuxpad Light",
+        "stylesheet": "editor-canvas-light.qss",
+        "background": "#f3f3f3",
+        "foreground": "#202020",
+        "gutter_foreground": "#666666",
+    },
+    "white_on_black": {
+        "label": "White on Black",
+        "stylesheet": "editor-canvas-white-on-black.qss",
+        "background": "#000000",
+        "foreground": "#ffffff",
+        "gutter_foreground": "#ffffff",
+    },
+    "black_on_white": {
+        "label": "Black on White",
+        "stylesheet": "editor-canvas-black-on-white.qss",
+        "background": "#ffffff",
+        "foreground": "#000000",
+        "gutter_foreground": "#000000",
+    },
+    "green_on_black": {
+        "label": "Green on Black",
+        "stylesheet": "editor-canvas-green-on-black.qss",
+        "background": "#000000",
+        "foreground": "#00ff00",
+        "gutter_foreground": "#00ff00",
+    },
+    "amber_on_black": {
+        "label": "Amber on Black",
+        "stylesheet": "editor-canvas-amber-on-black.qss",
+        "background": "#000000",
+        "foreground": "#ffbf00",
+        "gutter_foreground": "#ffbf00",
+    },
+    "white_on_blue": {
+        "label": "White on Blue",
+        "stylesheet": "editor-canvas-white-on-blue.qss",
+        "background": "#000080",
+        "foreground": "#ffffff",
+        "gutter_foreground": "#ffffff",
+    },
+    "blue_on_cyan": {
+        "label": "Blue on Cyan",
+        "stylesheet": "editor-canvas-blue-on-cyan.qss",
+        "background": "#80ffff",
+        "foreground": "#000080",
+        "gutter_foreground": "#000080",
+    },
+    "green_on_dark_green": {
+        "label": "Green on Dark Green",
+        "stylesheet": "editor-canvas-green-on-dark-green.qss",
+        "background": "#003300",
+        "foreground": "#00ff00",
+        "gutter_foreground": "#00ff00",
+    },
+    "salmon_on_red_brown": {
+        "label": "Salmon on Red Brown",
+        "stylesheet": "editor-canvas-salmon-on-red-brown.qss",
+        "background": "#5a2a24",
+        "foreground": "#e9967a",
+        "gutter_foreground": "#e9967a",
+    },
+}
+
+
+_SHORTCUT_TOKEN_RE = re.compile(r"[a-z0-9]+|[^\w\s+]", re.IGNORECASE)
+_SHORTCUT_TOKEN_ALIASES = {
+    "control": "ctrl",
+    "ctrl": "ctrl",
+    "ctl": "ctrl",
+}
+
+
+def shortcut_tokens(value):
+    """Return comparable shortcut tokens without imposing modifier order."""
+    return tuple(
+        _SHORTCUT_TOKEN_ALIASES.get(token, token)
+        for token in _SHORTCUT_TOKEN_RE.findall(value.casefold())
+    )
+
+
+def shortcut_query_matches(query, shortcut_tokens_value):
+    """Match aliases, optional plus signs and reordered shortcut modifiers."""
+    query_tokens = shortcut_tokens(query)
+    return bool(query_tokens) and all(
+        token in shortcut_tokens_value for token in query_tokens
+    )
+
 
 # Strong references to every open top-level editor window. This registry is
 # independent of whichever window created another one, so closing a parent or
@@ -471,7 +575,6 @@ def apply_retro_theme(window, theme, resources):
 
     retro_font = QFont("MS Sans Serif", 11)
     retro_font.setStyleHint(QFont.StyleHint.SansSerif)
-    window.setFont(retro_font)
 
     stylesheet_path = resources["stylesheets"].get(selected)
     if not stylesheet_path:
@@ -486,6 +589,10 @@ def apply_retro_theme(window, theme, resources):
     stylesheet = stylesheet.replace("__CHICAGO95_ROOT__", chicago_root)
     stylesheet = stylesheet.replace("__RALEIGH_ROOT__", raleigh_root)
     window.setStyleSheet(stylesheet)
+
+    # Reapply the Retro program font after the style/QSS switch. Windows can
+    # otherwise leave already-created controls on the native font until restart.
+    window.setFont(retro_font)
 
 
 def apply_kernel_modules_theme(window, theme):
@@ -573,12 +680,14 @@ class DropTextEdit(QPlainTextEdit):
         painter = QPainter(self.line_number_area)
         painter.setFont(self.line_number_area.font())
         metrics = self.line_number_area.fontMetrics()
-        if getattr(self, "dark_editor_canvas", True):
-            painter.fillRect(event.rect(), QColor("#1e1e1e"))
-            painter.setPen(QColor("#9a9a9a"))
-        else:
-            painter.fillRect(event.rect(), QColor("#ffffff"))
-            painter.setPen(QColor("#666666"))
+        gutter_background = getattr(
+            self, "editor_gutter_background", "#1e1e1e"
+        )
+        gutter_foreground = getattr(
+            self, "editor_gutter_foreground", "#9a9a9a"
+        )
+        painter.fillRect(event.rect(), QColor(gutter_background))
+        painter.setPen(QColor(gutter_foreground))
 
         block = self.firstVisibleBlock()
         block_number = block.blockNumber()
@@ -646,6 +755,7 @@ class Nuxpad(QMainWindow):
         self._loading = False
         self.replace_dialog = None
         self.about_dialog = None
+        self.shortcuts_dialog = None
         self.search_matches = []
         self.search_results_truncated = False
         self.current_search_index = -1
@@ -727,6 +837,8 @@ class Nuxpad(QMainWindow):
         # Shared Dark/Light choice. Kernel Modules remains the default apparatus.
         self.application_theme = "dark"
         self.retro_theme = False
+        self.editor_colour_scheme = "nuxpad_dark"
+        # Retain the old boolean only as a compatibility key for older configs.
         self.dark_editor_canvas = True
         # Baseline AppImage preference retained but suppressed by this experiment.
         self.appimage_theme = "dark"
@@ -787,8 +899,19 @@ class Nuxpad(QMainWindow):
 
             self.retro_theme = bool(data.get("retro_theme", False))
 
-            self.dark_editor_canvas = bool(
-                data.get("dark_editor_canvas", True)
+            saved_editor_colour_scheme = str(
+                data.get("editor_colour_scheme", "")
+            ).lower()
+            if saved_editor_colour_scheme in EDITOR_COLOUR_SCHEMES:
+                self.editor_colour_scheme = saved_editor_colour_scheme
+            else:
+                self.editor_colour_scheme = (
+                    "nuxpad_dark"
+                    if bool(data.get("dark_editor_canvas", True))
+                    else "nuxpad_light"
+                )
+            self.dark_editor_canvas = self.editor_colour_scheme not in (
+                "nuxpad_light", "black_on_white", "blue_on_cyan"
             )
 
             saved_appimage_theme = str(
@@ -851,6 +974,8 @@ class Nuxpad(QMainWindow):
             "font_slant": self.base_font_slant,
             "application_theme": self.application_theme,
             "retro_theme": self.retro_theme,
+            "editor_colour_scheme": self.editor_colour_scheme,
+            # Retained for backwards compatibility with Nuxpad <= 2.2.8.
             "dark_editor_canvas": self.dark_editor_canvas,
             "print_header_enabled": self.print_header_enabled,
             "print_header_left": self.print_header_left,
@@ -1084,6 +1209,10 @@ class Nuxpad(QMainWindow):
         self.bottom_search_entry.setPlaceholderText("Find text")
         self.bottom_search_entry.returnPressed.connect(self.find_next)
         self.bottom_search_entry.textChanged.connect(self.on_search_text_changed)
+
+        # Install Find Escape handling only after both Find entries exist.
+        self.search_entry.installEventFilter(self)
+        self.bottom_search_entry.installEventFilter(self)
         self.bottom_search_button = QPushButton("Find", self)
         self.bind_portable_icon(
             self.bottom_search_button,
@@ -1125,28 +1254,52 @@ class Nuxpad(QMainWindow):
         bottom_layout.addWidget(self.bottom_next_button)
         self.main_layout.addWidget(self.bottom_search)
 
-        # Keep every actionable toolbar/search button at the same height as
-        # File / Edit / View / Help. Widths remain natural to each control.
-        menu_button_height = max(
+        # Keep every toolbar/search control on one authoritative height.
+        # Re-run this after style/layout changes so split and in-line modes
+        # cannot drift apart.
+        self.sync_toolbar_control_heights()
+
+    def sync_toolbar_control_heights(self):
+        """Keep menu, List/Symbols and Find controls at one resolved height."""
+        controls = (
+            tuple(self.menu_buttons)
+            + (
+                self.list_button,
+                self.symbols_button,
+                self.search_button,
+                self.search_previous_button,
+                self.search_next_button,
+                self.bottom_search_button,
+                self.bottom_previous_button,
+                self.bottom_next_button,
+                self.search_entry,
+                self.bottom_search_entry,
+            )
+        )
+
+        # Release only height constraints before measuring the active style.
+        for widget in controls:
+            widget.setMinimumHeight(0)
+            widget.setMaximumHeight(16777215)
+            widget.ensurePolished()
+
+        control_height = max(
             button.sizeHint().height()
             for button in self.menu_buttons
         )
-        for button in (
-            self.list_button,
-            self.symbols_button,
-            self.search_button,
-            self.search_previous_button,
-            self.search_next_button,
-            self.bottom_search_button,
-            self.bottom_previous_button,
-            self.bottom_next_button,
-        ):
-            button.setFixedHeight(menu_button_height)
+        for widget in controls:
+            widget.setFixedHeight(control_height)
 
-        # Match both Find text-entry boxes to the same toolbar control height.
-        # Their horizontal stretch behaviour remains unchanged.
-        self.search_entry.setFixedHeight(menu_button_height)
-        self.bottom_search_entry.setFixedHeight(menu_button_height)
+    def eventFilter(self, watched, event):
+        """Return Esc from either Find entry to the editor canvas."""
+        if (
+            watched in (self.search_entry, self.bottom_search_entry)
+            and event.type() == QEvent.Type.KeyPress
+            and event.key() == Qt.Key.Key_Escape
+        ):
+            self.text_area.setFocus(Qt.FocusReason.ShortcutFocusReason)
+            return True
+        return super().eventFilter(watched, event)
 
     @staticmethod
     def tint_icon(icon, colour):
@@ -1261,6 +1414,10 @@ class Nuxpad(QMainWindow):
             menu, "Rename…", self.rename_current_file, QKeySequence("F2"),
             "edit-rename", QStyle.StandardPixmap.SP_FileDialogDetailedView,
         )
+        self.add_menu_action(
+            menu, "Properties", self.show_properties_dialog, QKeySequence("F4"),
+            "document-properties", QStyle.StandardPixmap.SP_FileDialogInfoView,
+        )
         menu.addSeparator()
         self.add_menu_action(
             menu, "Page Setup…", self.show_page_setup_dialog, QKeySequence("Ctrl+Shift+P"),
@@ -1308,6 +1465,15 @@ class Nuxpad(QMainWindow):
         )
         menu.addSeparator()
         self.add_menu_action(
+            menu, "List", self.insert_bullet_point, QKeySequence("Ctrl+L"),
+            "format-list-unordered", QStyle.StandardPixmap.SP_FileDialogListView,
+        )
+        self.add_menu_action(
+            menu, "Symbols…", self.show_symbols_popup, QKeySequence("Shift+F5"),
+            "insert-text", QStyle.StandardPixmap.SP_FileDialogInfoView,
+        )
+        menu.addSeparator()
+        self.add_menu_action(
             menu, "Date + Time", self.insert_time_date, QKeySequence("F5"),
             "appointment-new", QStyle.StandardPixmap.SP_FileDialogInfoView,
         )
@@ -1326,6 +1492,10 @@ class Nuxpad(QMainWindow):
             QStyle.StandardPixmap.SP_DialogYesButton,
         )
         menu.addSeparator()
+        self.add_menu_action(
+            menu, "Find", self.focus_search, QKeySequence.StandardKey.Find,
+            "edit-find", QStyle.StandardPixmap.SP_FileDialogContentsView,
+        )
         self.add_menu_action(
             menu, "Go To Line…", self.go_to_line, QKeySequence("Ctrl+G"),
             "go-jump", QStyle.StandardPixmap.SP_ArrowDown,
@@ -1369,22 +1539,30 @@ class Nuxpad(QMainWindow):
         self.line_numbers_action.triggered.connect(self.toggle_line_numbers)
         menu.addAction(self.line_numbers_action)
 
-        self.dark_editor_canvas_action = QAction(
-            "Dark Editor",
-            self,
-            checkable=True,
+        editor_colours_menu = menu.addMenu("Editor Colours")
+        self.editor_colour_group = QActionGroup(self)
+        self.editor_colour_group.setExclusive(True)
+        self.editor_colour_group.setExclusionPolicy(
+            QActionGroup.ExclusionPolicy.Exclusive
         )
-        self.dark_editor_canvas_action.setShortcut(
-            QKeySequence("Ctrl+Alt+Shift+E")
-        )
-        self.dark_editor_canvas_action.triggered.connect(
-            self.toggle_dark_editor_canvas
-        )
-        menu.addAction(self.dark_editor_canvas_action)
+        self.editor_colour_actions = {}
+        for index, (scheme_name, scheme) in enumerate(
+            EDITOR_COLOUR_SCHEMES.items()
+        ):
+            if index == 2:
+                editor_colours_menu.addSeparator()
+            action = QAction(scheme["label"], self, checkable=True)
+            self.editor_colour_group.addAction(action)
+            action.triggered.connect(
+                lambda checked=False, selected=scheme_name:
+                checked and self.set_editor_colour_scheme(selected)
+            )
+            editor_colours_menu.addAction(action)
+            self.editor_colour_actions[scheme_name] = action
 
         menu.addSeparator()
 
-        layout_menu = menu.addMenu("Layout")
+        layout_menu = menu.addMenu("Editor Layout")
         self.layout_group = QActionGroup(self)
         self.layout_group.setExclusive(True)
         self.layout_group.setExclusionPolicy(
@@ -1392,13 +1570,14 @@ class Nuxpad(QMainWindow):
         )
         self.layout_actions = {}
         layout_labels = {
-            1: "Inline — Top",
-            2: "Inline — Bottom",
-            3: "Split — Toolbar Up / Search Down",
-            4: "Split — Toolbar Down / Search Top",
+            1: "Toolbar Top / Find Bottom",
+            2: "Toolbar Top / Find In-line",
+            3: "Toolbar Bottom / Find Top",
+            4: "Toolbar Bottom / Find In-line",
         }
         for mode, label in layout_labels.items():
             action = QAction(label, self, checkable=True)
+            action.setShortcut(QKeySequence(f"Ctrl+{mode}"))
             self.layout_group.addAction(action)
             action.triggered.connect(
                 lambda checked=False, selected=mode:
@@ -1407,31 +1586,14 @@ class Nuxpad(QMainWindow):
             layout_menu.addAction(action)
             self.layout_actions[mode] = action
 
-        drag_drop_menu = menu.addMenu("Drag-and-Drop")
-        self.drop_behaviour_group = QActionGroup(self)
-        self.drop_behaviour_group.setExclusive(True)
-        self.drop_behaviour_group.setExclusionPolicy(
-            QActionGroup.ExclusionPolicy.Exclusive
-        )
-        self.drop_behaviour_actions = {}
-        behaviour_labels = {
-            "active_window": "Opens on Active Window",
-            "new_window": "Opens on New Window",
-        }
-        for mode, label in behaviour_labels.items():
-            action = QAction(label, self, checkable=True)
-            self.drop_behaviour_group.addAction(action)
-            action.triggered.connect(
-                lambda checked=False, selected=mode:
-                checked and self.set_drop_open_mode(selected)
-            )
-            drag_drop_menu.addAction(action)
-            self.drop_behaviour_actions[mode] = action
+        font_action = QAction("Editor Font…", self)
+        font_action.triggered.connect(self.open_font_dialog)
+        menu.addAction(font_action)
 
         menu.addSeparator()
         self.appimage_dark_mode_action = None
 
-        theme_menu = menu.addMenu("Theme")
+        theme_menu = menu.addMenu("App Theme")
         self.application_theme_group = QActionGroup(self)
         self.application_theme_group.setExclusive(True)
         self.application_theme_group.setExclusionPolicy(
@@ -1463,9 +1625,26 @@ class Nuxpad(QMainWindow):
         )
         theme_menu.addAction(self.retro_theme_action)
 
-        font_action = QAction("Display Font…", self)
-        font_action.triggered.connect(self.open_font_dialog)
-        menu.addAction(font_action)
+        drag_drop_menu = menu.addMenu("App Drag-and-Drop")
+        self.drop_behaviour_group = QActionGroup(self)
+        self.drop_behaviour_group.setExclusive(True)
+        self.drop_behaviour_group.setExclusionPolicy(
+            QActionGroup.ExclusionPolicy.Exclusive
+        )
+        self.drop_behaviour_actions = {}
+        behaviour_labels = {
+            "active_window": "Opens on Active Window",
+            "new_window": "Opens on New Window",
+        }
+        for mode, label in behaviour_labels.items():
+            action = QAction(label, self, checkable=True)
+            self.drop_behaviour_group.addAction(action)
+            action.triggered.connect(
+                lambda checked=False, selected=mode:
+                checked and self.set_drop_open_mode(selected)
+            )
+            drag_drop_menu.addAction(action)
+            self.drop_behaviour_actions[mode] = action
 
 
     def open_external_url(self, url):
@@ -1522,15 +1701,9 @@ class Nuxpad(QMainWindow):
         # A native QMenuBar is required for KDE's global menu integration.
 
     def bind_shortcuts(self):
-        find_action = QAction(self)
-        find_action.setShortcut(QKeySequence.StandardKey.Find)
-        find_action.triggered.connect(self.focus_search)
-        self.addAction(find_action)
+        """All Nuxpad shortcuts are owned by their live menu QActions."""
+        return
 
-        list_action = QAction(self)
-        list_action.setShortcut(QKeySequence("Ctrl+L"))
-        list_action.triggered.connect(self.insert_bullet_point)
-        self.addAction(list_action)
 
     def apply_preferences(self):
         self.wrap_action.setChecked(self.word_wrap)
@@ -1546,7 +1719,8 @@ class Nuxpad(QMainWindow):
         self.retro_theme_action.setChecked(
             self.retro_theme and self.retro_theme_available
         )
-        self.dark_editor_canvas_action.setChecked(self.dark_editor_canvas)
+        for scheme_name, action in self.editor_colour_actions.items():
+            action.setChecked(scheme_name == self.editor_colour_scheme)
         self.apply_menu_style()
         for mode, action in self.layout_actions.items():
             action.setChecked(mode == self.layout_mode)
@@ -1560,11 +1734,14 @@ class Nuxpad(QMainWindow):
         self.apply_editor_canvas_style()
 
     def apply_editor_canvas_style(self):
-        """Apply the independent canvas fill while preserving Retro framing."""
-        theme_name = "dark" if self.dark_editor_canvas else "light"
+        """Apply the independent editor colour scheme while preserving Retro framing."""
+        scheme = EDITOR_COLOUR_SCHEMES.get(
+            self.editor_colour_scheme,
+            EDITOR_COLOUR_SCHEMES["nuxpad_dark"],
+        )
         stylesheet_path = resource_path(
             "themes",
-            f"editor-canvas-{theme_name}.qss",
+            scheme["stylesheet"],
         )
         try:
             stylesheet = Path(stylesheet_path).read_text(encoding="utf-8")
@@ -1577,8 +1754,8 @@ class Nuxpad(QMainWindow):
             if scrollbar_start >= 0:
                 stylesheet = stylesheet[:scrollbar_start].rstrip()
 
-            # Keep Dark Editor independent for fill/text, but restore the exact
-            # x1.2 inset/boxed frame geometry for the active Retro variant.
+            # Editor Colours remains independent for fill/text, while Retro
+            # retains the exact x1.2 inset/boxed frame geometry.
             if self.application_theme == "dark":
                 retro_frame = """
 QPlainTextEdit,
@@ -1604,18 +1781,25 @@ QPlainTextEdit:focus {
             stylesheet = stylesheet.rstrip() + "\n" + retro_frame.strip()
 
         self.text_area.setStyleSheet(stylesheet)
-        self.text_area.dark_editor_canvas = self.dark_editor_canvas
+        self.text_area.editor_gutter_background = scheme["background"]
+        self.text_area.editor_gutter_foreground = scheme["gutter_foreground"]
         self.text_area.line_number_area.update()
         self.text_area.viewport().update()
 
-    def toggle_dark_editor_canvas(self, checked):
-        """Toggle only the document canvas; never the application shell."""
-        enabled = bool(checked)
+    def set_editor_colour_scheme(self, scheme_name):
+        """Select one editor colour scheme without changing the application shell."""
+        if scheme_name not in EDITOR_COLOUR_SCHEMES:
+            return
+
         for window in tuple(OPEN_WINDOWS):
-            window.dark_editor_canvas = enabled
-            window.dark_editor_canvas_action.blockSignals(True)
-            window.dark_editor_canvas_action.setChecked(enabled)
-            window.dark_editor_canvas_action.blockSignals(False)
+            window.editor_colour_scheme = scheme_name
+            window.dark_editor_canvas = scheme_name not in (
+                "nuxpad_light", "black_on_white", "blue_on_cyan"
+            )
+            for name, action in window.editor_colour_actions.items():
+                action.blockSignals(True)
+                action.setChecked(name == scheme_name)
+                action.blockSignals(False)
             window.apply_editor_canvas_style()
 
         self.save_preferences()
@@ -1672,6 +1856,7 @@ QPlainTextEdit:focus {
             # changes with Retro, so rebuild the editor stylesheet boundary.
             window.apply_editor_font()
             window.apply_editor_canvas_style()
+            window.sync_toolbar_control_heights()
             window.refresh_portable_icons()
             window.apply_about_link_palette()
             window.text_area.line_number_area.update()
@@ -2404,24 +2589,26 @@ QPlainTextEdit:focus {
         for widget in (self.toolbar, self.text_area, self.bottom_search):
             self.main_layout.removeWidget(widget)
 
-        split = self.layout_mode in (3, 4)
+        split = self.layout_mode in (1, 3)
         self.search_container.setVisible(not split)
         self.bottom_search.setVisible(split)
 
         if self.layout_mode == 1:
             self.main_layout.addWidget(self.toolbar)
             self.main_layout.addWidget(self.text_area, 1)
+            self.main_layout.addWidget(self.bottom_search)
         elif self.layout_mode == 2:
-            self.main_layout.addWidget(self.text_area, 1)
             self.main_layout.addWidget(self.toolbar)
+            self.main_layout.addWidget(self.text_area, 1)
         elif self.layout_mode == 3:
-            self.main_layout.addWidget(self.toolbar)
-            self.main_layout.addWidget(self.text_area, 1)
             self.main_layout.addWidget(self.bottom_search)
+            self.main_layout.addWidget(self.text_area, 1)
+            self.main_layout.addWidget(self.toolbar)
         else:
-            self.main_layout.addWidget(self.bottom_search)
             self.main_layout.addWidget(self.text_area, 1)
             self.main_layout.addWidget(self.toolbar)
+
+        self.sync_toolbar_control_heights()
 
     def apply_native_style(self):
         """Use baseline native styling only when x2.0 is not active."""
@@ -2432,6 +2619,94 @@ QPlainTextEdit:focus {
         )
 
     # ---------- Printing / Help ----------
+    def show_properties_dialog(self):
+        """Show file and plain-text document properties without modifying the document."""
+        dialog = QDialog(self)
+        dialog.setWindowTitle(f"Properties — {APP_NAME}")
+        dialog.setWindowIcon(self.windowIcon())
+        dialog.setMinimumWidth(640)
+
+        layout = QVBoxLayout(dialog)
+        layout.setContentsMargins(18, 16, 18, 14)
+        layout.setSpacing(12)
+
+        def add_group(title, rows):
+            box = QGroupBox(title, dialog)
+            form = QFormLayout(box)
+            form.setFieldGrowthPolicy(
+                QFormLayout.FieldGrowthPolicy.AllNonFixedFieldsGrow
+            )
+            for label, value in rows:
+                field = QLineEdit(str(value), box)
+                field.setReadOnly(True)
+                field.setCursorPosition(0)
+                form.addRow(label, field)
+            layout.addWidget(box)
+
+        if self.file_path:
+            path = os.path.abspath(self.file_path)
+            try:
+                stat_result = os.stat(path)
+                file_rows = (
+                    ("Name", os.path.basename(path)),
+                    ("Location", os.path.dirname(path)),
+                    ("Full path", path),
+                    ("Size", f"{stat_result.st_size:,} bytes"),
+                    (
+                        "Modified",
+                        datetime.fromtimestamp(
+                            stat_result.st_mtime
+                        ).astimezone().strftime("%Y-%m-%d %H:%M:%S %Z"),
+                    ),
+                    ("Permissions", oct(stat_result.st_mode & 0o777)),
+                    ("Symbolic link", "Yes" if os.path.islink(path) else "No"),
+                )
+            except OSError as exc:
+                file_rows = (
+                    ("File", path),
+                    ("Status", f"Could not inspect: {exc}"),
+                )
+        else:
+            file_rows = (
+                ("Name", "Untitled"),
+                ("Location", "Not saved yet"),
+                ("Full path", "Not saved yet"),
+                ("Size", "Unavailable"),
+                ("Modified", "Unavailable"),
+                ("Permissions", "Unavailable"),
+                ("Symbolic link", "No"),
+            )
+
+        add_group("File", file_rows)
+
+        newline_label = {
+            "\n": "LF",
+            "\r\n": "CRLF",
+            "\r": "CR",
+        }.get(self.file_newline, "LF")
+        add_group(
+            "Document",
+            (
+                ("Format", "Plain Text"),
+                ("Lines", f"{max(1, self.text_area.document().blockCount()):,}"),
+                (
+                    "Characters",
+                    f"{max(0, self.text_area.document().characterCount() - 1):,}",
+                ),
+                ("Encoding", self.file_encoding),
+                ("Newline", newline_label),
+                ("Unsaved changes", "No" if self.content_saved else "Yes"),
+            ),
+        )
+
+        buttons = QDialogButtonBox(
+            QDialogButtonBox.StandardButton.Ok,
+            dialog,
+        )
+        buttons.accepted.connect(dialog.accept)
+        layout.addWidget(buttons)
+        dialog.exec()
+
     def show_page_setup_dialog(self):
         """Configure compact left, centre and right header/footer fields."""
         dialog = QDialog(self)
@@ -2792,75 +3067,160 @@ QPlainTextEdit:focus {
         if dialog.exec() == QDialog.DialogCode.Accepted:
             self._print_document_with_header_footer(printer)
 
+    def _shortcut_catalog(self):
+        """Return assigned shortcuts grouped by the live Nuxpad AppMenu taxonomy."""
+        def collect(menu):
+            entries = []
+            for action in menu.actions():
+                submenu = action.menu()
+                if submenu is not None:
+                    entries.extend(collect(submenu))
+                    continue
+                if action.isSeparator():
+                    continue
+                shortcut = action.shortcut().toString(
+                    QKeySequence.SequenceFormat.NativeText
+                ).strip()
+                if shortcut:
+                    entries.append((action.text(), action))
+            return entries
+
+        return {
+            "File": collect(self.file_menu),
+            "Edit": collect(self.edit_menu),
+            "View": collect(self.view_menu),
+            "Help": collect(self.help_menu),
+        }
+
     def show_keyboard_shortcuts_dialog(self):
-        """Show the current Nuxpad keyboard shortcuts in a compact native dialog."""
+        """Show the live shortcut inventory with searchable fuzzy filtering."""
+        if self.shortcuts_dialog is not None:
+            self.shortcuts_dialog.show()
+            self.shortcuts_dialog.raise_()
+            self.shortcuts_dialog.activateWindow()
+            return
+
         dialog = QDialog(self)
-        dialog.setWindowTitle("Keyboard Shortcuts")
-        dialog.setModal(True)
-        dialog.setMinimumWidth(460)
+        dialog.setObjectName("keyboardShortcutsDialog")
+        dialog.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose, True)
+        dialog.setWindowTitle(f"Keyboard Shortcuts — {APP_NAME}")
+        dialog.setWindowIcon(self.windowIcon())
+        dialog.setModal(False)
+        dialog.resize(700, 560)
 
-        layout = QVBoxLayout(dialog)
-        layout.setContentsMargins(20, 18, 20, 16)
-        layout.setSpacing(10)
+        outer = QVBoxLayout(dialog)
+        filter_row = QHBoxLayout()
 
-        title = QLabel("<h3>Keyboard Shortcuts</h3>", dialog)
-        title.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        layout.addWidget(title)
+        search = QLineEdit(dialog)
+        search.setPlaceholderText("Search commands or shortcuts")
+        search.setClearButtonEnabled(True)
+        search.setAccessibleName("Search keyboard shortcuts")
 
-        shortcuts = QLabel(
-            "<table cellspacing='4' cellpadding='2' width='100%'>"
+        catalog = self._shortcut_catalog()
+        category = QComboBox(dialog)
+        category.setObjectName("keyboardShortcutsMenu")
+        category.setAccessibleName("Shortcut menu")
+        category.addItems(["All", *catalog.keys()])
+        category.setCurrentIndex(0)
 
-            "<tr><td colspan='2'><b>File</b></td></tr>"
-            "<tr><td>New</td><td align='right'>Ctrl+N</td></tr>"
-            "<tr><td>Open</td><td align='right'>Ctrl+O</td></tr>"
-            "<tr><td>Save</td><td align='right'>Ctrl+S</td></tr>"
-            "<tr><td>Save As</td><td align='right'>Ctrl+Shift+S</td></tr>"
-            "<tr><td>Rename</td><td align='right'>F2</td></tr><tr><td>Page Setup</td><td align='right'>Ctrl+Shift+P</td></tr>"
-            "<tr><td>Print</td><td align='right'>Ctrl+P</td></tr>"
+        filter_row.addWidget(search, 1)
+        filter_row.addWidget(QLabel("Menu:", dialog))
+        filter_row.addWidget(category)
+        outer.addLayout(filter_row)
 
-            "<tr><td colspan='2'><br><b>Edit</b></td></tr>"
-            "<tr><td>Undo</td><td align='right'>Ctrl+Z</td></tr>"
-            "<tr><td>Redo</td><td align='right'>Ctrl+Y</td></tr>"
-            "<tr><td>Cut</td><td align='right'>Ctrl+X</td></tr>"
-            "<tr><td>Copy</td><td align='right'>Ctrl+C</td></tr>"
-            "<tr><td>Paste</td><td align='right'>Ctrl+V</td></tr>"
-            "<tr><td>Select All</td><td align='right'>Ctrl+A</td></tr>"
+        rows = []
+        seen = set()
+        for menu_name, entries in catalog.items():
+            for label, action in entries:
+                shortcut = action.shortcut().toString(
+                    QKeySequence.SequenceFormat.NativeText
+                )
+                clean_label = label.replace("&", "").replace("…", "").strip()
+                if not shortcut or not clean_label or (clean_label, shortcut) in seen:
+                    continue
+                seen.add((clean_label, shortcut))
+                rows.append(
+                    (
+                        menu_name,
+                        clean_label,
+                        shortcut,
+                        clean_label.casefold(),
+                        shortcut_tokens(shortcut),
+                    )
+                )
+        rows.sort(key=lambda row: row[1].casefold())
 
-            "<tr><td colspan='2'><br><b>Insert</b></td></tr>"
-            "<tr><td>List</td><td align='right'>Ctrl+L</td></tr>"
-            "<tr><td>Date + Time</td><td align='right'>F5</td></tr>"
-            "<tr><td>Date Only</td><td align='right'>Ctrl+;</td></tr>"
-            "<tr><td>Time Only</td><td align='right'>Ctrl+:</td></tr>"
+        table = QTableWidget(len(rows), 2, dialog)
+        table.setAlternatingRowColors(True)
+        table.setHorizontalHeaderLabels(["Command", "Shortcut"])
+        table.horizontalHeader().setStretchLastSection(True)
+        table.verticalHeader().setVisible(False)
+        table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
+        table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+        for row_index, (
+            _menu_name,
+            label,
+            shortcut,
+            _label_search,
+            _shortcut_tokens_value,
+        ) in enumerate(rows):
+            table.setItem(row_index, 0, QTableWidgetItem(label))
+            table.setItem(row_index, 1, QTableWidgetItem(shortcut))
+        table.resizeColumnsToContents()
+        outer.addWidget(table, 1)
 
-            "<tr><td colspan='2'><br><b>View</b></td></tr><tr><td>Menu Only</td><td align='right'>Ctrl+Alt+Shift+M</td></tr><tr><td>Status Bar</td><td align='right'>Ctrl+Alt+Shift+S</td></tr>"
-            "<tr><td>Word Wrap</td><td align='right'>Ctrl+Alt+Shift+W</td></tr>"
-            "<tr><td>Line Numbers</td><td align='right'>Ctrl+Alt+Shift+L</td></tr>"
-            "<tr><td>Dark Editor</td><td align='right'>Ctrl+Alt+Shift+E</td></tr>"
+        no_matches = QLabel("No matching shortcuts.", dialog)
+        no_matches.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        no_matches.hide()
+        outer.addWidget(no_matches)
 
-            "<tr><td colspan='2'><br><b>Search</b></td></tr>"
-            "<tr><td>Find</td><td align='right'>Ctrl+F</td></tr>"
-            "<tr><td>Go To Line</td><td align='right'>Ctrl+G</td></tr>"
-            "<tr><td>Replace</td><td align='right'>Ctrl+H</td></tr>"
+        def apply_filter():
+            query = search.text().strip().casefold()
+            selected = category.currentText()
+            any_visible = False
+            for row_index, (
+                menu_name,
+                _label,
+                _shortcut,
+                label_search,
+                shortcut_tokens_value,
+            ) in enumerate(rows):
+                row_visible = (
+                    (selected == "All" or selected == menu_name)
+                    and (
+                        not query
+                        or query in label_search
+                        or shortcut_query_matches(query, shortcut_tokens_value)
+                    )
+                )
+                table.setRowHidden(row_index, not row_visible)
+                any_visible = any_visible or row_visible
+            table.setVisible(any_visible)
+            no_matches.setVisible(not any_visible)
 
-            "<tr><td colspan='2'><br><b>Help</b></td></tr>"
-            "<tr><td>Documentation</td><td align='right'>F1</td></tr>"
+        search.textChanged.connect(apply_filter)
+        category.currentTextChanged.connect(apply_filter)
+        apply_filter()
 
-            "<tr><td colspan='2'><br><b>Application</b></td></tr>"
-            "<tr><td>New Window</td><td align='right'>Ctrl+Shift+N</td></tr>"
-            "<tr><td>Exit</td><td align='right'>Ctrl+Q</td></tr>"
-
-            "</table>",
+        buttons = QDialogButtonBox(
+            QDialogButtonBox.StandardButton.Ok,
             dialog,
         )
-        shortcuts.setTextFormat(Qt.TextFormat.RichText)
-        shortcuts.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        layout.addWidget(shortcuts)
+        ok_button = buttons.button(QDialogButtonBox.StandardButton.Ok)
+        if ok_button is not None:
+            ok_button.setText("OK")
+        buttons.accepted.connect(dialog.close)
+        outer.addWidget(buttons)
 
-        buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok, parent=dialog)
-        buttons.accepted.connect(dialog.accept)
-        layout.addWidget(buttons)
+        dialog.finished.connect(
+            lambda _result: setattr(self, "shortcuts_dialog", None)
+        )
+        self.shortcuts_dialog = dialog
+        dialog.show()
+        dialog.raise_()
+        dialog.activateWindow()
+        search.setFocus(Qt.FocusReason.ShortcutFocusReason)
 
-        dialog.exec()
 
     def apply_about_link_palette(self):
         """Render deterministic About links independent of QSS/visited state."""

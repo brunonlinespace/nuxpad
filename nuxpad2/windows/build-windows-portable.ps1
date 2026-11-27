@@ -8,7 +8,7 @@ $ErrorActionPreference = "Stop"
 
 $AppName = "Nuxpad"
 $DisplayName = "Nuxpad 2"
-$Version = "2.2.8"
+$Version = "2.3.4"
 $Architecture = "x64"
 
 if ([System.Environment]::OSVersion.Platform -ne [System.PlatformID]::Win32NT) {
@@ -113,6 +113,9 @@ $PyInstallerArguments = @(
     "--specpath", $BuildRoot,
     "--paths", $ProjectRoot,
     "--add-data", "$($ProgramRoot)\assets;nuxpad2\assets",
+    "--add-data", "$($ProgramRoot)\LICENSE;.",
+    "--add-data", "$($ProgramRoot)\docs\CROSS_PLATFORM_ARCHITECTURE.md;docs",
+    "--add-data", "$($ProgramRoot)\docs\RELEASE_NOTES.md;docs",
     $SourceEntry
 )
 & $PyInstaller @PyInstallerArguments
@@ -127,17 +130,6 @@ Copy-Item -Path (Join-Path $PyInstallerDist "Nuxpad\*") `
     -Destination $PackageDir -Recurse -Force
 Copy-Item -LiteralPath (Join-Path $ProjectRoot "README.md") `
     -Destination (Join-Path $PackageDir "README.md")
-
-$PackageDocs = Join-Path $PackageDir "docs"
-New-Item -ItemType Directory -Path $PackageDocs -Force | Out-Null
-Copy-Item -LiteralPath (Join-Path $ProgramRoot "LICENSE") `
-    -Destination (Join-Path $PackageDocs "LICENSE")
-Copy-Item -LiteralPath (Join-Path $ProjectRoot "README.md") `
-    -Destination (Join-Path $PackageDocs "README.md")
-Copy-Item -LiteralPath (Join-Path $ProgramRoot "docs\CROSS_PLATFORM_ARCHITECTURE.md") `
-    -Destination (Join-Path $PackageDocs "CROSS_PLATFORM_ARCHITECTURE.md")
-Copy-Item -LiteralPath (Join-Path $ProgramRoot "docs\RELEASE_NOTES.md") `
-    -Destination (Join-Path $PackageDocs "RELEASE_NOTES.md")
 
 $Executable = Join-Path $PackageDir "Nuxpad.exe"
 $BuiltVersion = (& $Executable --version 2>&1 | Out-String).Trim()
@@ -188,6 +180,9 @@ Canonical source SHA-256: $SourceHash
 Output: $(Split-Path -Leaf $ZipFile)
 Output SHA-256: $Hash
 "@ | Set-Content -LiteralPath $BuildInfo -Encoding UTF8
+
+Write-Step "Cleaning temporary Windows build files"
+Remove-Item -LiteralPath $BuildRoot -Recurse -Force
 
 Write-Step "Build complete"
 Write-Host $PackageDir

@@ -1,7 +1,7 @@
 VSVersionInfo(
   ffi=FixedFileInfo(
-    filevers=(2, 2, 8, 0),
-    prodvers=(2, 2, 8, 0),
+    filevers=(2, 3, 4, 0),
+    prodvers=(2, 3, 4, 0),
     mask=0x3f,
     flags=0x0,
     OS=0x40004,
@@ -16,12 +16,12 @@ VSVersionInfo(
         [
           StringStruct('CompanyName', 'brunonlinespace'),
           StringStruct('FileDescription', 'Nuxpad 2 lightweight text editor'),
-          StringStruct('FileVersion', '2.2.8'),
+          StringStruct('FileVersion', '2.3.4'),
           StringStruct('InternalName', 'Nuxpad'),
           StringStruct('LegalCopyright', 'Copyright Bruno Machado'),
           StringStruct('OriginalFilename', 'Nuxpad.exe'),
           StringStruct('ProductName', 'Nuxpad 2'),
-          StringStruct('ProductVersion', '2.2.8')
+          StringStruct('ProductVersion', '2.3.4')
         ]
       )
     ]),

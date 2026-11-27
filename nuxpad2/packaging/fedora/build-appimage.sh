@@ -4,7 +4,7 @@ umask 022
 
 APP_NAME="Nuxpad 2"
 APP_ID="nuxpad"
-APP_VERSION="2.2.8"
+APP_VERSION="2.3.4"
 APPSTREAM_ID="io.github.brunonlinespace.nuxpad"
 DESKTOP_FILE_ID="${APPSTREAM_ID}.desktop"
 OUTPUT_STEM="Nuxpad"
@@ -104,7 +104,7 @@ import json, sys
 from pathlib import Path
 p=Path(sys.argv[1]); d=json.loads(p.read_text(encoding='utf-8'))
 expected={
-'id':'nuxpad','name':'Nuxpad 2','version':'2.2.8','component_kind':'editor',
+'id':'nuxpad','name':'Nuxpad 2','version':'2.3.4','component_kind':'editor',
 'desktop_id':'io.github.brunonlinespace.nuxpad','publisher_id':'brunonlinespace',
 'repository':'https://github.com/brunonlinespace/nuxpad','tagline':'Friendly. Fast. Focused.',
 'extensions':['.txt','.log','.ini','.cfg','.conf'],'portable_command':['main.py'],

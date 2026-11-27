@@ -21,6 +21,6 @@
     <mediatype>text/x-log</mediatype>
   </provides>
   <releases>
-    <release version="2.2.8" date="2026-11-26" />
+    <release version="2.3.4" date="2026-11-26" />
   </releases>
 </component>

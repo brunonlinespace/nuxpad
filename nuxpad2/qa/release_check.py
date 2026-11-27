@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Static/source release gate for Nuxpad 2.2.8."""
+"""Static/source release gate for Nuxpad 2.3.4."""
 
 from __future__ import annotations
 
@@ -16,7 +16,7 @@ SOURCE = PROGRAM_ROOT / "source" / "nuxpad.py"
 SOURCE_MANIFEST = PROGRAM_ROOT / "SOURCE_MANIFEST.sha256"
 COMPONENT_MANIFEST = PROJECT_ROOT / "suite-pythoine-component.json"
 
-EXPECTED_VERSION = "2.2.8"
+EXPECTED_VERSION = "2.3.4"
 EXPECTED_FILES_AT_ROOT = {"README.md", "main.py", "suite-pythoine-component.json", "nuxpad2"}
 
 
@@ -87,6 +87,14 @@ def check_structure() -> None:
         PROGRAM_ROOT / "assets/themes/kernel-modules-light.qss",
         PROGRAM_ROOT / "assets/themes/editor-canvas-dark.qss",
         PROGRAM_ROOT / "assets/themes/editor-canvas-light.qss",
+        PROGRAM_ROOT / "assets/themes/editor-canvas-white-on-black.qss",
+        PROGRAM_ROOT / "assets/themes/editor-canvas-black-on-white.qss",
+        PROGRAM_ROOT / "assets/themes/editor-canvas-green-on-black.qss",
+        PROGRAM_ROOT / "assets/themes/editor-canvas-amber-on-black.qss",
+        PROGRAM_ROOT / "assets/themes/editor-canvas-white-on-blue.qss",
+        PROGRAM_ROOT / "assets/themes/editor-canvas-blue-on-cyan.qss",
+        PROGRAM_ROOT / "assets/themes/editor-canvas-green-on-dark-green.qss",
+        PROGRAM_ROOT / "assets/themes/editor-canvas-salmon-on-red-brown.qss",
         PROGRAM_ROOT / "assets/themes/chicago95/chicago95.qss",
         PROGRAM_ROOT / "assets/themes/chicago95/chicago95-dark.qss",
         PROGRAM_ROOT / "assets/themes/chicago95/ATTRIBUTION.md",
@@ -151,8 +159,8 @@ def check_source() -> None:
         fail("approved About description is missing")
     if "https://github.com/brunonlinespace/nuxpad" not in text:
         fail("current repository URL is missing from live application source")
-    if 'QAction("Display Font…", self)' not in text:
-        fail("View menu Display Font label is missing")
+    if 'QAction("Editor Font…", self)' not in text:
+        fail("View menu Editor Font label is missing")
 
     menu_start = text.find("    def add_menu_action(")
     menu_end = text.find("    def make_file_menu(", menu_start)
@@ -174,6 +182,38 @@ def check_source() -> None:
     ]
     if any(position < 0 for position in labels) or labels != sorted(labels):
         fail("Edit menu date/time order is not Date + Time, Date Only, Time Only")
+
+    file_start = text.find("    def make_file_menu(")
+    file_end = text.find("    def make_edit_menu(", file_start)
+    file_menu = text[file_start:file_end]
+    file_order = (
+        file_menu.find('menu, "Rename…"'),
+        file_menu.find('menu, "Properties"'),
+        file_menu.find('menu, "Page Setup…"'),
+    )
+    if any(position < 0 for position in file_order) or file_order != tuple(sorted(file_order)):
+        fail("File menu order is not Rename, Properties, Page Setup")
+    if 'QKeySequence("F4")' not in file_menu:
+        fail("File Properties F4 shortcut is missing")
+
+    edit_order = (
+        edit_menu.find('menu, "Paste"'),
+        edit_menu.find('menu, "List"'),
+        edit_menu.find('menu, "Symbols…"'),
+        edit_menu.find('menu, "Date + Time"'),
+        edit_menu.find('menu, "Select All"'),
+        edit_menu.find('menu, "Find"'),
+        edit_menu.find('menu, "Go To Line…"'),
+        edit_menu.find('menu, "Replace…"'),
+    )
+    if any(position < 0 for position in edit_order) or edit_order != tuple(sorted(edit_order)):
+        fail("Edit menu order does not match the 2.3.4 contract")
+    if 'menu, "List", self.insert_bullet_point, QKeySequence("Ctrl+L")' not in edit_menu:
+        fail("Edit List live menu action is missing")
+    if 'menu, "Symbols…", self.show_symbols_popup, QKeySequence("Shift+F5")' not in edit_menu:
+        fail("Edit Symbols… live menu action or Shift+F5 shortcut is missing")
+    if 'menu, "Find", self.focus_search, QKeySequence.StandardKey.Find' not in edit_menu:
+        fail("Edit Find live menu action is missing")
     if 'QPrintDialog, QPrinter' not in text:
         fail("Nuxpad printing dependency unexpectedly changed")
     if "PyQt6.QtPdf" in text or "PyQt6.QtWebEngine" in text:
@@ -186,13 +226,11 @@ def check_source() -> None:
         'QKeySequence("Ctrl+:")',
         'QKeySequence("Ctrl+Alt+Shift+W")',
         'QKeySequence("Ctrl+Alt+Shift+L")',
-        'QKeySequence("Ctrl+Alt+Shift+E")',
         'QKeySequence("Ctrl+Alt+Shift+M")',
         'QKeySequence("Ctrl+Alt+Shift+S")',
         '"Date Only"',
         '"Time Only"',
-        '"Dark Editor"',
-        'menu.addMenu("Drag-and-Drop")',
+        'menu.addMenu("App Drag-and-Drop")',
         '"Opens on Active Window"',
         '"Opens on New Window"',
         '"Documentation"',
@@ -207,8 +245,95 @@ def check_source() -> None:
         if required_fragment not in text:
             fail(f"x3.2 requested UI/shortcut contract missing: {required_fragment}")
 
+    view_start = text.find("    def make_view_menu(")
+    view_end = text.find("    def open_external_url(", view_start)
+    view_menu = text[view_start:view_end]
+    view_order = (
+        view_menu.find('menu.addMenu("Editor Colours")'),
+        view_menu.find('menu.addMenu("Editor Layout")'),
+        view_menu.find('QAction("Editor Font…", self)'),
+        view_menu.find('menu.addMenu("App Theme")'),
+        view_menu.find('menu.addMenu("App Drag-and-Drop")'),
+    )
+    if any(position < 0 for position in view_order) or view_order != tuple(sorted(view_order)):
+        fail("View lower-block order does not match the 2.3.4 contract")
+
+    expected_layout_labels = (
+        '1: "Toolbar Top / Find Bottom"',
+        '2: "Toolbar Top / Find In-line"',
+        '3: "Toolbar Bottom / Find Top"',
+        '4: "Toolbar Bottom / Find In-line"',
+    )
+    for fragment in expected_layout_labels:
+        if fragment not in view_menu:
+            fail(f"Editor Layout label missing: {fragment}")
+    if 'action.setShortcut(QKeySequence(f"Ctrl+{mode}"))' not in view_menu:
+        fail("Editor Layout Ctrl+1..4 shortcut binding is missing")
+
+    apply_layout_start = text.find("    def apply_layout_mode(self):")
+    apply_layout_end = text.find("    def apply_native_style(", apply_layout_start)
+    apply_layout = text[apply_layout_start:apply_layout_end]
+    if "split = self.layout_mode in (1, 3)" not in apply_layout:
+        fail("Editor Layout mode mapping does not use Find-bottom modes 1 and 3")
+    for fragment in (
+        "if self.layout_mode == 1:",
+        "self.main_layout.addWidget(self.toolbar)",
+        "self.main_layout.addWidget(self.bottom_search)",
+        "elif self.layout_mode == 2:",
+        "elif self.layout_mode == 3:",
+    ):
+        if fragment not in apply_layout:
+            fail(f"Editor Layout implementation marker missing: {fragment}")
+
+    shortcut_start = text.find("    def _shortcut_catalog(self):")
+    shortcut_end = text.find("    def apply_about_link_palette(self):", shortcut_start)
+    shortcut_block = text[shortcut_start:shortcut_end]
+    for fragment in (
+        '"File": collect(self.file_menu)',
+        '"Edit": collect(self.edit_menu)',
+        '"View": collect(self.view_menu)',
+        '"Help": collect(self.help_menu)',
+        'dialog.setModal(False)',
+        'dialog.resize(700, 560)',
+        'search.setPlaceholderText("Search commands or shortcuts")',
+        'QLabel("Menu:", dialog)',
+        'table.setHorizontalHeaderLabels(["Command", "Shortcut"])',
+        '"No matching shortcuts."',
+        'shortcut_query_matches(query, shortcut_tokens_value)',
+        'self.shortcuts_dialog = dialog',
+        'Keyboard Shortcuts — {APP_NAME}',
+    ):
+        if fragment not in shortcut_block:
+            fail(f"live Keyboard Shortcuts contract missing: {fragment}")
+
+    bind_start = text.find("    def bind_shortcuts(self):")
+    bind_end = text.find("    def apply_preferences(self):", bind_start)
+    bind_block = text[bind_start:bind_end]
+    if "QAction(" in bind_block or "Ctrl+L" in bind_block or "StandardKey.Find" in bind_block:
+        fail("obsolete hidden Find/List shortcut actions remain")
+
+    if "    def show_properties_dialog(self):" not in text:
+        fail("Properties dialog implementation is missing")
+    properties_start = text.find("    def show_properties_dialog(self):")
+    properties_end = text.find("    def show_page_setup_dialog(self):", properties_start)
+    properties_block = text[properties_start:properties_end]
+    for fragment in (
+        'dialog.setWindowTitle(f"Properties — {APP_NAME}")',
+        'add_group("File", file_rows)',
+        '("Format", "Plain Text")',
+        '("Encoding", self.file_encoding)',
+        '("Newline", newline_label)',
+        '("Unsaved changes", "No" if self.content_saved else "Yes")',
+    ):
+        if fragment not in properties_block:
+            fail(f"Properties contract missing: {fragment}")
+
     for forbidden_fragment in (
         'menu.addMenu("Behaviour")',
+        'menu.addMenu("Layout")',
+        'menu.addMenu("Drag-and-Drop")',
+        'menu.addMenu("Theme")',
+        'QAction("Display Font…", self)',
         '"Drag and drop opens on active window"',
         '"Drag and drop opens on new window"',
     ):
@@ -274,7 +399,7 @@ def check_source() -> None:
     if "QPrintDialog(printer, None)" not in text:
         fail("Print/Print to File is not parentless")
     if 'QFontDialog.getFont(current, None, "Font")' not in text:
-        fail("Display Font picker is not parentless")
+        fail("Editor Font picker is not parentless")
 
     open_start = text.find("    def open_file(self):")
     open_end = text.find("    @staticmethod", open_start)
@@ -290,12 +415,12 @@ def check_source() -> None:
 
     if "KERNEL_MODULES_THEME_EXPERIMENT = True" not in text:
         fail("Kernel Modules shell-theme experiment flag is missing")
-    if "menu_button_height = max(" not in text:
-        fail("toolbar/search button height normalization is missing")
-    if "self.search_entry.setFixedHeight(menu_button_height)" not in text:
-        fail("top Find entry height normalization is missing")
-    if "self.bottom_search_entry.setFixedHeight(menu_button_height)" not in text:
-        fail("bottom Find entry height normalization is missing")
+    if "def sync_toolbar_control_heights(self):" not in text:
+        fail("reusable toolbar/search height normalization is missing")
+    if "self.sync_toolbar_control_heights()" not in text:
+        fail("toolbar/search height normalization is not invoked")
+    if "widget.setFixedHeight(control_height)" not in text:
+        fail("resolved toolbar/search control height is not applied")
     for button_name in (
         "self.list_button",
         "self.symbols_button",
@@ -308,6 +433,27 @@ def check_source() -> None:
     ):
         if button_name not in text:
             fail(f"button height normalization target missing: {button_name}")
+    bottom_find_created = text.find("self.bottom_search_entry = QLineEdit(self)")
+    top_filter_installed = text.find("self.search_entry.installEventFilter(self)")
+    bottom_filter_installed = text.find("self.bottom_search_entry.installEventFilter(self)")
+    if min(bottom_find_created, top_filter_installed, bottom_filter_installed) < 0:
+        fail("Find Escape filter construction-order contract is incomplete")
+    if top_filter_installed < bottom_find_created or bottom_filter_installed < bottom_find_created:
+        fail("Find Escape filters are installed before both Find entries exist")
+
+    if "self.search_entry.installEventFilter(self)" not in text:
+        fail("top Find entry Esc filter is missing")
+    if "self.bottom_search_entry.installEventFilter(self)" not in text:
+        fail("bottom Find entry Esc filter is missing")
+    if "Qt.Key.Key_Escape" not in text or "self.text_area.setFocus" not in text:
+        fail("Find Esc-to-editor behavior is missing")
+
+    retro_start = text.find("def apply_retro_theme(window, theme, resources):")
+    retro_end = text.find("def apply_kernel_modules_theme(window, theme):", retro_start)
+    retro_block = text[retro_start:retro_end]
+    if retro_block.find("window.setFont(retro_font)") < retro_block.find("window.setStyleSheet(stylesheet)"):
+        fail("Retro program font is still applied before the runtime QSS switch")
+
     if "apply_kernel_modules_theme(" not in text:
         fail("Kernel Modules shell-theme helper is missing")
     if 'self.application_theme = "dark"' not in text:
@@ -338,14 +484,23 @@ def check_source() -> None:
         fail("x1.2 Retro resource discovery is missing")
     if 'self.setObjectName("editorCanvas")' in text:
         fail("x2.3 editorCanvas object-name intervention was not removed")
-    if 'self.dark_editor_canvas = True' not in text:
-        fail("Dark Editor Canvas default is missing")
-    if '"dark_editor_canvas": self.dark_editor_canvas' not in text:
-        fail("Dark Editor Canvas persistence is missing")
-    if '"Dark Editor"' not in text:
-        fail("View Dark Editor action is missing")
-    if '"Dark Editor Canvas"' in text:
-        fail("superseded Dark Editor Canvas visible label remains")
+    if 'self.editor_colour_scheme = "nuxpad_dark"' not in text:
+        fail("Nuxpad Dark editor-colour default is missing")
+    if '"editor_colour_scheme": self.editor_colour_scheme' not in text:
+        fail("Editor Colours persistence is missing")
+    if 'menu.addMenu("Editor Colours")' not in text:
+        fail("View Editor Colours submenu is missing")
+    if 'self.editor_colour_group = QActionGroup(self)' not in text:
+        fail("Editor Colours exclusive QActionGroup is missing")
+    if '"Dark Editor"' in text or '"Dark Editor Canvas"' in text:
+        fail("superseded Dark Editor visible action remains")
+    for label in (
+        "Nuxpad Dark", "Nuxpad Light", "White on Black", "Black on White",
+        "Green on Black", "Amber on Black", "White on Blue",
+        "Blue on Cyan", "Green on Dark Green", "Salmon on Red Brown",
+    ):
+        if f'"label": "{label}"' not in text:
+            fail(f"Editor Colours preset is missing: {label}")
     if "def apply_editor_canvas_style(self):" not in text:
         fail("independent editor-canvas helper is missing")
     if 'colour = "#ffffff" if self.application_theme == "dark" else "#202020"' not in text:
@@ -362,25 +517,85 @@ def check_source() -> None:
     for theme_text in (dark_theme_text, light_theme_text):
         if re.search(r"(?im)^\s*font-family\s*:", theme_text):
             fail("shell theme overrides program font family")
-        if re.search(r"(?im)^\s*font-size\s*:", theme_text):
-            fail("shell theme overrides program font size")
+        shell_without_shortcuts = theme_text.split(
+            "Keyboard Shortcuts dialog authority:", 1
+        )[0]
+        if re.search(r"(?im)^\s*font-size\s*:", shell_without_shortcuts):
+            fail("shell theme overrides program font size outside Keyboard Shortcuts")
     for shell_theme_text in (dark_theme_text, light_theme_text):
         if "QPlainTextEdit" in shell_theme_text:
             fail("application shell stylesheet still controls the editor canvas")
+
+    shortcuts_required = {
+        "dark": (
+            dark_theme_text,
+            (
+                'QDialog#keyboardShortcutsDialog',
+                'background-color: #1e1e1e;',
+                'background-color: #333333;',
+                'border: 1px solid #454545;',
+                'background-color: #252526;',
+                'alternate-background-color: #252526;',
+                'gridline-color: #2d2d2d;',
+                'border-radius: 4px;',
+                'font-weight: bold;',
+                'background-color: #005999;',
+                'background-color: #2a2a2a;',
+                'color: #777777;',
+                'border-color: #3a3a3a;',
+                'background: #424242;',
+                'background: #686868;',
+                'font-size: 10pt;',
+            ),
+        ),
+        "light": (
+            light_theme_text,
+            (
+                'QDialog#keyboardShortcutsDialog',
+                'background-color: #f3f3f3;',
+                'background-color: #ffffff;',
+                'border: 1px solid #aaaaaa;',
+                'alternate-background-color: #f0f0f0;',
+                'gridline-color: #d0d0d0;',
+                'border: 1px solid #b8b8b8;',
+                'background-color: #e6e6e6;',
+                'font-weight: bold;',
+                'background-color: #f7f7f7;',
+                'background-color: #dcecf8;',
+                'background-color: #c5e0f2;',
+                'background-color: #eeeeee;',
+                'background: #b0b0b0;',
+                'background: #8e8e8e;',
+                'font-size: 10pt;',
+            ),
+        ),
+    }
+    for variant, (theme_text, markers) in shortcuts_required.items():
+        for marker in markers:
+            if marker not in theme_text:
+                fail(f"Keyboard Shortcuts {variant} Kernel Modules parity marker missing: {marker}")
+    if 'font-family:' in dark_theme_text.lower() or 'font-family:' in light_theme_text.lower():
+        fail("Keyboard Shortcuts parity introduced a font-family override")
+    if 'dialog.setObjectName("keyboardShortcutsDialog")' not in text:
+        fail("Keyboard Shortcuts dialog parity object name is missing")
+    if 'category.setObjectName("keyboardShortcutsMenu")' not in text:
+        fail("Keyboard Shortcuts combo parity object name is missing")
+    if "table.setAlternatingRowColors(True)" not in text:
+        fail("Keyboard Shortcuts alternating rows are not enabled")
 
     editor_dark_text = (PROGRAM_ROOT / "assets/themes/editor-canvas-dark.qss").read_text(encoding="utf-8")
     editor_light_text = (PROGRAM_ROOT / "assets/themes/editor-canvas-light.qss").read_text(encoding="utf-8")
     for colour in ("#1e1e1e", "#dcdcdc", "#333333", "#094771", "#424242", "#686868"):
         if colour not in editor_dark_text.lower():
             fail(f"dark editor canvas lost x2.2 authority colour: {colour}")
-    for colour in ("#ffffff", "#202020", "#b8b8b8", "#0b64a0", "#b0b0b0", "#8e8e8e"):
+    for colour in ("#f3f3f3", "#202020", "#b8b8b8", "#0b64a0", "#b0b0b0", "#8e8e8e"):
         if colour not in editor_light_text.lower():
             fail(f"light editor canvas colour missing: {colour}")
 
     set_theme_start = text.find("    def set_application_theme(")
     set_theme_end = text.find("    def effective_appimage_theme(", set_theme_start)
     set_theme_block = text[set_theme_start:set_theme_end]
-    if "dark_editor_canvas" in set_theme_block or "apply_editor_canvas_style" in set_theme_block:
+    if "editor_colour_scheme" in set_theme_block or "apply_editor_canvas_style" in set_theme_block:
         fail("application shell theme is coupled to editor canvas")
 
     retro_light = (
@@ -736,8 +951,11 @@ def check_source() -> None:
         "nuxpad2/assets/icons/nuxpad-about.png",
         "○ **Dark** and ○ **Light** are mutually exclusive theme variants.",
         "✓ **Chicago95/Raleigh** is a checkmark",
-        "**Layout** — mutually exclusive radio choices",
-        "**Drag-and-Drop** — mutually exclusive radio choices",
+        "**Editor Layout** — mutually exclusive radio choices",
+        "**App Drag-and-Drop** — mutually exclusive radio choices",
+        "**Editor Colours** — mutually exclusive radio choices",
+        "○ Nuxpad Dark",
+        "○ Nuxpad Light",
         "./nuxpad2/packaging/fedora/build-appimage.sh",
         "python3 main.py",
         "## Current supported build targets",
@@ -745,13 +963,14 @@ def check_source() -> None:
         if required_readme not in root_readme:
             fail(f"root README current-contract marker missing: {required_readme}")
 
-    # 2.2.8 requested selector/readme corrections.
+    # 2.3.4 selector/readme corrections.
     view_start = text.find("    def make_view_menu(self):")
     view_end = text.find("    def open_external_url", view_start)
     view_block = text[view_start:view_end]
     for group_name in (
         "self.layout_group",
         "self.drop_behaviour_group",
+        "self.editor_colour_group",
         "self.application_theme_group",
     ):
         policy = (
@@ -762,6 +981,27 @@ def check_source() -> None:
         )
         if policy not in view_block:
             fail(f"explicit Qt exclusive policy missing: {group_name}")
+
+    editor_pairs = {
+        "editor-canvas-dark.qss": ("#1e1e1e", "#dcdcdc"),
+        "editor-canvas-light.qss": ("#f3f3f3", "#202020"),
+        "editor-canvas-white-on-black.qss": ("#000000", "#ffffff"),
+        "editor-canvas-black-on-white.qss": ("#ffffff", "#000000"),
+        "editor-canvas-green-on-black.qss": ("#000000", "#00ff00"),
+        "editor-canvas-amber-on-black.qss": ("#000000", "#ffbf00"),
+        "editor-canvas-white-on-blue.qss": ("#000080", "#ffffff"),
+        "editor-canvas-blue-on-cyan.qss": ("#80ffff", "#000080"),
+        "editor-canvas-green-on-dark-green.qss": ("#003300", "#00ff00"),
+        "editor-canvas-salmon-on-red-brown.qss": ("#5a2a24", "#e9967a"),
+    }
+    for filename, (background, foreground) in editor_pairs.items():
+        editor_qss = (PROGRAM_ROOT / "assets/themes" / filename).read_text(
+            encoding="utf-8"
+        ).lower()
+        if f"background-color: {background};" not in editor_qss:
+            fail(f"Editor Colours background mismatch: {filename}")
+        if f"color: {foreground};" not in editor_qss:
+            fail(f"Editor Colours foreground mismatch: {filename}")
 
     for modern_theme in (
         PROGRAM_ROOT / "assets/themes/kernel-modules-dark.qss",
@@ -788,7 +1028,7 @@ def check_source() -> None:
     if "Kernel Modules" in appearance:
         fail("README Appearance still uses Kernel Modules naming")
 
-    # 2.2.8 focused About-dialog contract.
+    # Preserved About-dialog contract.
     help_start = text.find("    def make_help_menu(self):")
     help_end = text.find("    def bind_shortcuts(self):", help_start)
     help_block = text[help_start:help_end]
@@ -815,7 +1055,7 @@ def check_source() -> None:
 def check_packaging() -> None:
     builder = (PROGRAM_ROOT / "packaging/fedora/build-appimage.sh").read_text(encoding="utf-8")
     for fragment in [
-        'APP_VERSION="2.2.8"',
+        'APP_VERSION="2.3.4"',
         'OUTPUT_STEM="Nuxpad"',
         "Do not run the Nuxpad AppImage builder with sudo/root.",
         "Validated for Fedora 43/44.",
@@ -881,12 +1121,39 @@ def check_packaging() -> None:
         fail("AppStream first description paragraph is too short")
 
     windows = (PROGRAM_ROOT / "windows/build-windows-portable.ps1").read_text(encoding="utf-8")
-    if '$Version = "2.2.8"' not in windows:
+    if '$Version = "2.3.4"' not in windows:
         fail("Windows builder version mismatch")
     if 'Join-Path $ProjectRoot "main.py"' not in windows:
         fail("Windows builder is not using portable main.py")
     if 'Copy-Item -LiteralPath (Join-Path $ProjectRoot "README.md")' not in windows:
         fail("Windows portable package does not include the source-root README")
+    if '$PackageDocs = Join-Path $PackageDir "docs"' in windows:
+        fail("Windows portable package still creates a visible docs directory")
+    for internal_doc in (
+        '"--add-data", "$($ProgramRoot)\\LICENSE;."',
+        '"--add-data", "$($ProgramRoot)\\docs\\CROSS_PLATFORM_ARCHITECTURE.md;docs"',
+        '"--add-data", "$($ProgramRoot)\\docs\\RELEASE_NOTES.md;docs"',
+    ):
+        if internal_doc not in windows:
+            fail(f"Windows internal documentation bundle missing: {internal_doc}")
+    cleanup = 'Remove-Item -LiteralPath $BuildRoot -Recurse -Force'
+    if windows.count(cleanup) < 2:
+        fail("Windows builder does not clean the temporary build workspace after success")
+    cleanup_pos = windows.rfind(cleanup)
+    build_info_pos = windows.find('Set-Content -LiteralPath $BuildInfo -Encoding UTF8')
+    if cleanup_pos < build_info_pos:
+        fail("Windows successful-build cleanup occurs before final build records")
+
+    windows_readme = (PROGRAM_ROOT / "windows/README.md").read_text(encoding="utf-8")
+    for marker in (
+        "Set-ExecutionPolicy -Scope Process Bypass",
+        "-SkipSmokeTest",
+        "-PythonCommand",
+        "no visible root-level `docs\\` folder",
+        "left in place for diagnosis",
+    ):
+        if marker not in windows_readme:
+            fail(f"Windows README instruction missing: {marker}")
 
 
 def check_manifest() -> None:
