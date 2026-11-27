@@ -2,21 +2,47 @@
 
 ## 2.3.4
 
-- Add **File → Properties** with `F4`.
-- Add **Edit → List**, **Edit → Symbols**, and **Edit → Find** in the agreed menu positions.
-- Replace the hard-coded Keyboard Shortcuts dialog with a searchable, menu-filtered live QAction inventory.
-- Reorder and relabel the lower View blocks as **Editor Layout**, **Editor Font…**, **App Theme**, and **App Drag-and-Drop**.
-- Relabel Editor Layout to the four Toolbar/Find positions, make **Toolbar Top / Find Bottom** the default, and bind them to `Ctrl+1` through `Ctrl+4`.
-- Synchronize current release identity to 2.3.4.
-- No unrelated editor-engine, theme, About, native-dialog, packaging, or source-tree changes.
+- Give the non-Retro **Keyboard Shortcuts** dialog dialog-specific Dark/Light styling aligned to the LinSpectacles Kernel Modules 1.0.5-exp1 authority for the shared controls, while deliberately retaining Nuxpad's existing font face.
+- Enable alternating shortcut-table rows, 4 px table radius, bold headers, and the matching authority colours, borders, buttons, focus states, and scrollbars.
+- Soften **Nuxpad Light** editor canvas from pure white to `#f3f3f3` while retaining the existing `#202020` foreground and the rest of the light-canvas treatment.
+- Add the separate **Black on White** editor preset using `#000000` on `#ffffff`.
+- Preserve the 2.3.3 Find-filter startup hotfix and all accepted 2.3.2 corrections.
+- No unrelated editor-engine, file-handling, About, native-dialog, packaging, Retro-asset, or source-tree changes.
+
+## 2.3.3
+
+- Fix the 2.3.2 startup crash in the Find Escape-focus handling.
+- Install the event filters only after both Find entries have been created.
+- Preserve the intended **Esc returns focus to the editor canvas** behaviour.
+- No other functional change from 2.3.2.
+
+## 2.3.2
+
+- Rename the Edit menu entry to **Symbols…** and assign `Shift+F5`.
+- Relabel the in-toolbar Editor Layout modes to **Find In-line**.
+- Make `Esc` in either Find entry return focus to the editor canvas.
+- Re-resolve one common toolbar/menu/List/Symbols/Find control height after layout or shell-style changes so split and in-line modes stay visually aligned.
+- Reapply the Retro program font after the runtime style/QSS switch so Windows Light/Dark changes do not leave existing controls on the native font until restart.
+- Preserve the existing success-only cleanup of `nuxpad2\build\windows-x64` in the Windows builder.
+- No unrelated editor-engine, file-handling, About, native-dialog, packaging, or theme-colour changes.
+
+## 2.3.1
+
+- Add **File → Properties** directly below Rename with `F4`.
+- Add **Edit → List** and **Edit → Symbols** between Paste and Date + Time as a separated block.
+- Add **Edit → Find** immediately before Go To Line.
+- Replace the old hard-coded Keyboard Shortcuts dialog with a searchable, menu-filtered live QAction inventory.
+- Make the Keyboard Shortcuts dialog modeless, single-instance, and synchronized to Nuxpad's live File/Edit/View/Help actions.
+- Reorder the lower View blocks as **Editor Layout**, **Editor Font…**, **App Theme**, and **App Drag-and-Drop**.
+- Relabel Editor Layout to the four Toolbar/Find arrangements, make **Toolbar Top / Find Bottom** the default, and bind them to `Ctrl+1` through `Ctrl+4`.
+- No unrelated editor-engine, file-handling, theme, About, native-dialog, packaging, or source-tree changes.
 
 ## 2.3.0
 
-- Replace **Dark Editor** with the exclusive **Editor Colours** submenu while preserving Nuxpad Dark/Light and adding the seven approved colour pairs.
+- Replace **Dark Editor** with the exclusive **Editor Colours** submenu while preserving Nuxpad Dark/Light and adding the seven approved additional colour pairs.
 - Replace the Windows-folder README with the approved detailed build instructions.
 - Remove the temporary Windows build workspace after a fully successful build while retaining it on failure.
 - Keep only `Nuxpad.exe`, `_internal\`, and the master `README.md` visible at the Windows portable root; supporting documentation is bundled internally.
-- Synchronize current release identity to 2.3.0.
 - No unrelated editor-engine or application behaviour changes.
 
 ## 2.2.8

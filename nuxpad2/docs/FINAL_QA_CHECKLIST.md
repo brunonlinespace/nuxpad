@@ -37,21 +37,25 @@
 - [ ] Redo: Ctrl+Y
 - [ ] Cut / Copy / Paste / Select All
 - [ ] List: Ctrl+L
-- [ ] Rename: Ctrl+Alt+R
+- [ ] Symbols…: Shift+F5
+- [ ] Rename: F2
 - [ ] Date + Time: F5
-- [ ] Date: Ctrl+D
-- [ ] Time: Ctrl+T
+- [ ] Date Only: Ctrl+;
+- [ ] Time Only: Ctrl+:
 - [ ] Find: Ctrl+F
 - [ ] Go To Line: Ctrl+G
 - [ ] Replace: Ctrl+H
 - [ ] Keyboard Shortcuts dialog is modeless, searchable, menu-filtered, single-instance, and matches actual bindings
+- [ ] Keyboard Shortcuts non-Retro Dark matches the Kernel Modules authority except for font face
+- [ ] Keyboard Shortcuts non-Retro Light matches the Kernel Modules authority except for font face
+- [ ] Keyboard Shortcuts table uses alternating rows, bold headers, and the authority border/radius treatment
 
 ## Interface
 
 - [ ] Editor Layout: Toolbar Top / Find Bottom (Ctrl+1, default)
-- [ ] Editor Layout: Toolbar Top / Find Top (Ctrl+2)
+- [ ] Editor Layout: Toolbar Top / Find In-line (Ctrl+2)
 - [ ] Editor Layout: Toolbar Bottom / Find Top (Ctrl+3)
-- [ ] Editor Layout: Toolbar Bottom / Find Bottom (Ctrl+4)
+- [ ] Editor Layout: Toolbar Bottom / Find In-line (Ctrl+4)
 - [ ] Menu Only on and off
 - [ ] Status Bar on and off
 - [ ] Full path appears on the left of the status bar
@@ -59,6 +63,8 @@
 - [ ] Line-number gutter keeps the Qt UI font
 - [ ] User font changes affect only document text
 - [ ] Symbols popup inserts characters and restores focus
+- [ ] Esc in either Find field returns focus to the editor canvas
+- [ ] Menu/List/Symbols/Find controls retain equal height in split and in-line layouts
 - [ ] More Symbols opens an available character-map utility
 - [ ] AppMenu actions display no icons
 - [ ] Edit menu exposes List and Symbols between Paste and Date + Time, with separators
@@ -66,6 +72,9 @@
 - [ ] Date/time order remains Date + Time → Date → Time
 - [ ] View lower blocks are Editor Layout → Editor Font… → App Theme → App Drag-and-Drop
 - [ ] View menu spacing and labels are correct
+- [ ] Nuxpad Light uses `#202020` text on `#f3f3f3`
+- [ ] Black on White uses `#000000` text on `#ffffff`
+- [ ] Retro program font remains correct after runtime Light/Dark switching on Windows
 - [ ] About uses the approved classic Microsoft Notepad description
 - [ ] About repository link is https://github.com/brunonlinespace/nuxpad
 
