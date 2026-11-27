@@ -222,3 +222,89 @@ QToolTip {
     border: 1px solid #454545;
     padding: 4px;
 }
+
+/*
+ * Keyboard Shortcuts dialog authority:
+ * LinSpectacles Kernel Modules 1.0.5-exp1 DARK_STYLESHEET.
+ * Font face intentionally remains Nuxpad/host-controlled.
+ */
+QDialog#keyboardShortcutsDialog {
+    background-color: #1e1e1e;
+    color: #dcdcdc;
+    font-size: 10pt;
+}
+QDialog#keyboardShortcutsDialog QLineEdit,
+QDialog#keyboardShortcutsDialog QComboBox {
+    background-color: #333333;
+    color: #ffffff;
+    border: 1px solid #454545;
+    border-radius: 4px;
+    padding: 4px 8px;
+    selection-background-color: #007acc;
+}
+QDialog#keyboardShortcutsDialog QLineEdit:focus,
+QDialog#keyboardShortcutsDialog QComboBox:focus {
+    border: 1px solid #007acc;
+}
+QComboBox#keyboardShortcutsMenu QAbstractItemView {
+    background-color: #252526;
+    color: #dcdcdc;
+    selection-background-color: #094771;
+    selection-color: #ffffff;
+}
+QDialog#keyboardShortcutsDialog QTableWidget {
+    background-color: #1e1e1e;
+    alternate-background-color: #252526;
+    color: #dcdcdc;
+    gridline-color: #2d2d2d;
+    border: 1px solid #333333;
+    border-radius: 4px;
+}
+QDialog#keyboardShortcutsDialog QTableWidget::item:selected {
+    background-color: #094771;
+    color: #ffffff;
+}
+QDialog#keyboardShortcutsDialog QHeaderView::section {
+    background-color: #2d2d2d;
+    color: #ffffff;
+    padding: 5px;
+    border: 1px solid #333333;
+    font-weight: bold;
+}
+QDialog#keyboardShortcutsDialog QPushButton {
+    background-color: #333333;
+    color: #ffffff;
+    border: 1px solid #454545;
+    border-radius: 3px;
+    padding: 4px 8px;
+}
+QDialog#keyboardShortcutsDialog QPushButton:hover {
+    background-color: #007acc;
+    border-color: #007acc;
+}
+QDialog#keyboardShortcutsDialog QPushButton:pressed {
+    background-color: #005999;
+    border-color: #454545;
+}
+QDialog#keyboardShortcutsDialog QPushButton:disabled {
+    background-color: #2a2a2a;
+    color: #777777;
+    border-color: #3a3a3a;
+}
+QDialog#keyboardShortcutsDialog QScrollBar:vertical,
+QDialog#keyboardShortcutsDialog QScrollBar:horizontal {
+    background: #1e1e1e;
+    border: none;
+    width: 10px;
+    height: 10px;
+}
+QDialog#keyboardShortcutsDialog QScrollBar::handle:vertical,
+QDialog#keyboardShortcutsDialog QScrollBar::handle:horizontal {
+    background: #424242;
+    border-radius: 5px;
+}
+QDialog#keyboardShortcutsDialog QScrollBar::handle:vertical:hover,
+QDialog#keyboardShortcutsDialog QScrollBar::handle:horizontal:hover {
+    background: #686868;
+}
+
