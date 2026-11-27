@@ -293,6 +293,7 @@ The default interface state is **Menu Only on**, **Status Bar on**, **Word Wrap 
 | `Ctrl+V` | Paste |
 | `Ctrl+A` | Select All |
 | `Ctrl+L` | List |
+| `Shift+F5` | Symbols… |
 | `F5` | Date + Time |
 | `Ctrl+;` | Date Only |
 | `Ctrl+:` | Time Only |
@@ -304,9 +305,9 @@ The default interface state is **Menu Only on**, **Status Bar on**, **Word Wrap 
 | `Ctrl+Alt+Shift+W` | Word Wrap |
 | `Ctrl+Alt+Shift+L` | Line Numbers |
 | `Ctrl+1` | Toolbar Top / Find Bottom |
-| `Ctrl+2` | Toolbar Top / Find Top |
+| `Ctrl+2` | Toolbar Top / Find In-line |
 | `Ctrl+3` | Toolbar Bottom / Find Top |
-| `Ctrl+4` | Toolbar Bottom / Find Bottom |
+| `Ctrl+4` | Toolbar Bottom / Find In-line |
 | `F1` | Documentation |
 
 **Help → Keyboard Shortcuts** provides the live shortcut inventory in a searchable, menu-filtered dialog.
